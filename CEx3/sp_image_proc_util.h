@@ -3,10 +3,10 @@
 
 //SPECIAL NOTE: DON'T change the header file
 
-extern "C"{
-	//Use this syntax in-order to include C-header files
-	//HINT : You don't need to include other C header files here -> Maybe in sp_image_proc_util.c ? <-
-	#include "SPPoint.h"
+extern "C" {
+//Use this syntax in-order to include C-header files
+//HINT : You don't need to include other C header files here -> Maybe in sp_image_proc_util.c ? <-
+#include "SPPoint.h"
 }
 
 /**
@@ -21,7 +21,7 @@ extern "C"{
  * @return NULL if str is NULL or nBins <= 0 or allocation error occurred,
  *  otherwise a two dimensional array representing the histogram.
  */
-SPPoint** spGetRGBHist(const char* str,int imageIndex, int nBins);
+SPPoint** spGetRGBHist(const char* str, int imageIndex, int nBins);
 
 /**
  * Returns the average L2-squared distance between rgbHistA and rgbHistB. 
@@ -60,7 +60,8 @@ double spRGBHistL2Distance(SPPoint** rgbHistA, SPPoint** rgbHistB);
  *		   Otherwise, the total number of features retained will be stored in
  * 		   nFeatures, and the actual features will be returned.
  */
-SPPoint** spGetSiftDescriptors(const char* str, int imageIndex, int nFeaturesToExtract, int *nFeatures);
+SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
+		int nFeaturesToExtract, int *nFeatures);
 
 /**
  * Given sift descriptors of the images in the database (databaseFeatures), finds the
@@ -106,6 +107,10 @@ int* spBestSIFTL2SquaredDistance(int kClosest, SPPoint* queryFeature,
 		SPPoint*** databaseFeatures, int numberOfImages,
 		int* nFeaturesPerImage);
 
-
-
+class sp_image_proc_util {
+public:
+	sp_image_proc_util();
+	virtual ~sp_image_proc_util();
+};
 #endif /* SP_IMAGE_PROC_UTIL_H_ */
+
