@@ -34,12 +34,13 @@ using namespace cv;
 //	rgbHistB*=NULL*;
 //	return 0;
 //}
-SPPoint** spGetSiftDescriptors(const char* str, int imageIndex, int nFeaturesToExtract, int *nFeatures){
+SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
+		int nFeaturesToExtract, int *nFeatures) {
 	cv::Mat src;
 	SPPoint** result;
 
-	src = cv::imread(str,CV_LOAD_IMAGE_GRAYSCALE);
-	if(src.empty()){
+	src = cv::imread(str, CV_LOAD_IMAGE_GRAYSCALE);
+	if (src.empty()) {
 		//type error msg
 		return NULL;
 	}
@@ -47,22 +48,17 @@ SPPoint** spGetSiftDescriptors(const char* str, int imageIndex, int nFeaturesToE
 	result = (SPPoint**) malloc(nFeaturesToExtract * sizeof(SPPoint*));
 
 	//Key points will be stored in kp1;
-		std::vector<cv::KeyPoint> kp1;
-		//Feature values will be stored in ds1;
-		cv::Mat ds1;
-		//Creating  a Sift Descriptor extractor
-		cv::Ptr<cv::xfeatures2d::SiftDescriptorExtractor> detect =
-				cv::xfeatures2d::SIFT::create(MAX_NUMBER_OF_FEATURES);
-		//Extracting features
-		//The features will be stored in ds1
-		//The output type of ds1 is CV_32F (float)
-		detect->detect(src, kp1, cv::Mat());
-		detect->compute(src, kp1, ds1);
-
-
-
-
-
+	std::vector<cv::KeyPoint> kp1;
+	//Feature values will be stored in ds1;
+	cv::Mat ds1;
+	//Creating  a Sift Descriptor extractor
+	cv::Ptr<cv::xfeatures2d::SiftDescriptorExtractor> detect =
+			cv::xfeatures2d::SIFT::create(MAX_NUMBER_OF_FEATURES);
+	//Extracting features
+	//The features will be stored in ds1
+	//The output type of ds1 is CV_32F (float)
+	detect->detect(src, kp1, cv::Mat());
+	detect->compute(src, kp1, ds1);
 
 	return NULL;
 }
