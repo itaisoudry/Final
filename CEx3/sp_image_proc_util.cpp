@@ -38,7 +38,7 @@ SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
 	src = cv::imread(str, CV_LOAD_IMAGE_GRAYSCALE);
 	if (src.empty()) {
 		//TODO-change to couldn't load img+str
-		printf(ERROR_LOAD_IMAGE,str);
+		printf(ERROR_LOAD_IMAGE, str);
 		return NULL;
 	}
 
@@ -61,16 +61,26 @@ SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
 	for (int i = 0; i < descriptors.rows; i++) {
 		double data[descriptors.cols];
 		for (int j = 0; j < descriptors.cols; j++) {
-			data[j] = descriptors.at<double>(i,j);
+			data[j] = descriptors.at<double>(i, j);
 		}
-		result[i] = spPointCreate(data,descriptors.cols,imageIndex);
+		result[i] = spPointCreate(data, descriptors.cols, imageIndex);
 	}
-
 	return result;
 }
+int* spBestSIFTL2SquaredDistance(int kClosest, SPPoint* queryFeature,
+		SPPoint*** databaseFeatures, int numberOfImages,
+		int* nFeaturesPerImage) {
 
-int main() {
-	char* str = "/home/soudry/git/CAssignment3/CEx3/images/img120.png";
-	int* num = (int*) malloc(sizeof(int));
-	spGetSiftDescriptors(str, 0, 512, num);
+	if (queryFeature == NULL || databaseFeatures == NULL
+			|| nFeaturesPerImage == NULL || numberOfImages <= 1) {
+		printf(ERROR_GENERAL);
+		return NULL;
+	}
+	int* num = (int*)malloc(sizeof(int));
+	*num=1;
+	return num;
+
+
+
 }
+
