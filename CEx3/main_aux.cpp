@@ -77,3 +77,23 @@ int getNumberOfFeatures() {
 	}
 	return numberOfFeatures;
 }
+
+void validateCharAllocation(char** validationArray, int size) {
+	int index = 0;
+	bool found = false;
+	while (!found && index < size) {
+		if (validationArray[index] == NULL) {
+			found = true;
+		}
+		index++;
+	}
+	if (found) {
+		for (index = 0; index < size; index++) {
+			if (validationArray[index] != NULL) {
+			free(validationArray[index]);
+		}
+	}
+
+}
+
+}

@@ -34,7 +34,7 @@
 #define MSG_NEAREST_IMGS_LOCAL "Nearest images using local descriptors:\n"
 //General
 #define MAX_STRING 1024
-#define NUM_OF_ALLOCATION_IN_MAIN 4
+#define CHAR_ALLOCATION_IN_MAIN 4
 #define MIN_NUM_OF_BINS 1
 #define MAX_NUM_OF_BINS 255
 #define MIN_NUM_OF_IMGS 1
@@ -46,6 +46,6 @@ int getNumberOfImages();
 void getImagesSuffix(char* imagesSuffixInput);
 int getNumberOfBins();
 int getNumberOfFeatures();
-
+void validateCharAllocation(char** validationArray, int size);
 
 #endif /* MAIN_AUX_H_ */
