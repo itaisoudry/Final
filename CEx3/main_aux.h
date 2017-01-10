@@ -27,6 +27,7 @@
 #define ERROR_NUM_OF_BINS "An error occurred - invalid number of bins\n"
 #define ERROR_NUM_OF_FEATURES "An error occurred - invalid number of features\n"
 #define ERROR_ALLOCAT "An error occurred - allocation failure\n"
+#define ERROR_LOAD_IMAGE "Image cannot be loaded - ‘%s’:\n"
 #define ERROR_GENERAL "An error occured"
 //MESSAGES
 #define MSG_EXITING "Exiting...\n"
