@@ -20,7 +20,9 @@
 #include <opencv2/features2d.hpp>
 
 #include <cstdio>
-
+extern "C" {
+#include "SPBPriorityQueue.h"
+}
 using namespace cv;
 SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
 		int nFeaturesToExtract, int *nFeatures) {
@@ -30,7 +32,6 @@ SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
 	std::vector<cv::KeyPoint> keyPoints;
 	//Feature values will be stored in ds1;
 	cv::Mat descriptors;
-	int index = 0;
 	if (str == NULL || nFeatures == NULL || nFeaturesToExtract <= 0) {
 		printf(ERROR_GENERAL);
 		return NULL;
@@ -70,17 +71,28 @@ SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
 int* spBestSIFTL2SquaredDistance(int kClosest, SPPoint* queryFeature,
 		SPPoint*** databaseFeatures, int numberOfImages,
 		int* nFeaturesPerImage) {
-
+	SPBPQueue* kClosestQueue;
 	if (queryFeature == NULL || databaseFeatures == NULL
 			|| nFeaturesPerImage == NULL || numberOfImages <= 1) {
 		printf(ERROR_GENERAL);
 		return NULL;
 	}
-	int* num = (int*)malloc(sizeof(int));
-	*num=1;
+	kClosestQueue = spBPQueueCreate(kClosest);
+	if(kClosestQueue==NULL){
+		printf(ERROR_GENERAL);
+		return NULL;
+	}
+	//for every image
+	for(int i=0;i<numberOfImages;i++){
+		//scna all features and calc L2 distance with query features
+		for(int j=0;j<nFeaturesPerImage[i];j++){
+			double L2Distance = spPointL2SquaredDistance(databaseFeatures[i][j],queryFeature);
+			spBPQueueEnqueue(kClosestQueue,i,L2Distance);
+		}
+	}
+	int* num = (int*) malloc(sizeof(int));
+	*num = 1;
 	return num;
-
-
 
 }
 
