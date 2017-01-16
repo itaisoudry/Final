@@ -23,57 +23,58 @@
 extern "C" {
 #include "SPBPriorityQueue.h"
 }
+#define NORMALIZE_FACTOR 0.33
 using namespace cv;
-SPPoint** spGetRGBHist(const char* str, int imageIndex, int nBins){
-		cv::Mat src;
-		SPPoint** result =(SPPoint**) malloc(3 * sizeof(SPPoint*));
-		if (str == NULL || nBins <= 0 || imageIndex <= 0) {
-			printf(ERROR_GENERAL);
-			return NULL;
-		}
-		src = cv::imread(str, CV_LOAD_IMAGE_GRAYSCALE);
-		if (src.empty()) {
-			//TODO-change to couldn't load img+str
-			printf(ERROR_LOAD_IMAGE, str);
-			return NULL;
-		}
-		//separate the img in 3 places (b,g,r)
-		std::vector<Mat> bgr_planes;
-		split(src,bgr_planes);
-		float range[] = {0, nBins};
-		const float* histRange = {range};
-		Mat b_hist, g_hist, r_hist;
-		calcHist(&bgr_planes[0], 1, 0, Mat(),  b_hist, 1, &nBins, &histRange);
-		calcHist(&bgr_planes[1], 1, 0, Mat(),  b_hist, 1, &nBins, &histRange);
-		calcHist(&bgr_planes[2], 1, 0, Mat(),  b_hist, 1, &nBins, &histRange);
-		double data[nBins];
-		for (int i=0; i<nBins;i++){
-			data[i] = r_hist.at<double>(i);
-		}
-		result[0]= spPointCreate(data,nBins,imageIndex);
-		for (int i=0; i<nBins;i++){
-					data[i] = g_hist.at<double>(i);
-		}
-		result[1]= spPointCreate(data,nBins,imageIndex);
+SPPoint** spGetRGBHist(const char* str, int imageIndex, int nBins) {
+	cv::Mat src;
+	SPPoint** result = (SPPoint**) malloc(3 * sizeof(SPPoint*));
+	if (str == NULL || nBins <= 0 || imageIndex <= 0) {
+		printf(ERROR_GENERAL);
+		return NULL;
+	}
+	src = cv::imread(str, CV_LOAD_IMAGE_GRAYSCALE);
+	if (src.empty()) {
+		//TODO-change to couldn't load img+str
+		printf(ERROR_LOAD_IMAGE, str);
+		return NULL;
+	}
+	//separate the img in 3 places (b,g,r)
+	std::vector<Mat> bgr_planes;
+	split(src, bgr_planes);
+	float range[] = { 0, nBins };
+	const float* histRange = { range };
+	Mat b_hist, g_hist, r_hist;
+	calcHist(&bgr_planes[0], 1, 0, Mat(), b_hist, 1, &nBins, &histRange);
+	calcHist(&bgr_planes[1], 1, 0, Mat(), b_hist, 1, &nBins, &histRange);
+	calcHist(&bgr_planes[2], 1, 0, Mat(), b_hist, 1, &nBins, &histRange);
+	double data[nBins];
+	for (int i = 0; i < nBins; i++) {
+		data[i] = r_hist.at<double>(i);
+	}
+	result[0] = spPointCreate(data, nBins, imageIndex);
+	for (int i = 0; i < nBins; i++) {
+		data[i] = g_hist.at<double>(i);
+	}
+	result[1] = spPointCreate(data, nBins, imageIndex);
 
-		for (int i=0; i<nBins;i++){
-					data[i] = b_hist.at<double>(i);
-		}
-		result[2]= spPointCreate(data,nBins,imageIndex);
-		return result;
+	for (int i = 0; i < nBins; i++) {
+		data[i] = b_hist.at<double>(i);
+	}
+	result[2] = spPointCreate(data, nBins, imageIndex);
+	return result;
 }
-double spRGBHistL2Distance(SPPoint** rgbHistA, SPPoint** rgbHistB){
+double spRGBHistL2Distance(SPPoint** rgbHistA, SPPoint** rgbHistB) {
 
-		double result;
-		double sumR,sumG,sumB;
-		sumR = spPointL2SquaredDistance(rgbHistA[0],rgbHistB[0]);
-		sumG = spPointL2SquaredDistance(rgbHistA[1],rgbHistB[1]);
-		sumB = spPointL2SquaredDistance(rgbHistA[2],rgbHistB[2]);
+	double result;
+	double sumR, sumG, sumB;
+	sumR = spPointL2SquaredDistance(rgbHistA[0], rgbHistB[0]);
+	sumG = spPointL2SquaredDistance(rgbHistA[1], rgbHistB[1]);
+	sumB = spPointL2SquaredDistance(rgbHistA[2], rgbHistB[2]);
 
-		result = 0.33*sumR +0.33*sumG + 0.33*sumB;
-		return result;
+	result = NORMALIZE_FACTOR * sumR + NORMALIZE_FACTOR * sumG
+			+ NORMALIZE_FACTOR * sumB;
+	return result;
 }
-
 
 SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
 		int nFeaturesToExtract, int *nFeatures) {
@@ -129,20 +130,34 @@ int* spBestSIFTL2SquaredDistance(int kClosest, SPPoint* queryFeature,
 		return NULL;
 	}
 	kClosestQueue = spBPQueueCreate(kClosest);
-	if(kClosestQueue==NULL){
+	if (kClosestQueue == NULL) {
 		printf(ERROR_GENERAL);
 		return NULL;
 	}
 	//for every image
-	for(int i=0;i<numberOfImages;i++){
-		//scna all features and calc L2 distance with query features
-		for(int j=0;j<nFeaturesPerImage[i];j++){
-			double L2Distance = spPointL2SquaredDistance(databaseFeatures[i][j],queryFeature);
-			spBPQueueEnqueue(kClosestQueue,i,L2Distance);
+	for (int i = 0; i < numberOfImages; i++) {
+		//scan all features and calc L2 distance with query features
+		for (int j = 0; j < nFeaturesPerImage[i]; j++) {
+			double L2Distance = spPointL2SquaredDistance(databaseFeatures[i][j],
+					queryFeature);
+			spBPQueueEnqueue(kClosestQueue, i, L2Distance);
 		}
 	}
-	int* num = (int*) malloc(sizeof(int));
-	*num = 1;
+	BPQueueElement* result = (BPQueueElement*) malloc(sizeof(BPQueueElement));
+	if (result == NULL) {
+		printf(ERROR_ALLOCAT);
+		//TODO - FREE ALL!
+		return NULL;
+	}
+	int* num = (int*) malloc(kClosest * sizeof(int));
+	int queueSize = spBPQueueSize(kClosestQueue);
+	for (int i = 0; i < queueSize; i++) {
+		spBPQueuePeek(kClosestQueue, result);
+		spBPQueueDequeue(kClosestQueue);
+		printf("%d\n",result->index);
+		num[i] = result->index;
+	}
+
 	return num;
 
 }

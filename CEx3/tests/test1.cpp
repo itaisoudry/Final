@@ -35,9 +35,6 @@ void spBestSIFTL2SquaredDistanceTest() {
 		printf("SUCCESS\n");
 	else
 		printf("FAILED\n");
-
-
-
 }
 int main() {
 	spGetSiftDescriptorsTest();
