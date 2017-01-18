@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+#include "SPPoint.h"
+#include "SPBPriorityQueue.h"
 
 //Input
 #define INPUT_IMG_DIRECTORY_PATH "Enter images directory path:\n"
@@ -28,7 +31,7 @@
 #define ERROR_NUM_OF_FEATURES "An error occurred - invalid number of features\n"
 #define ERROR_ALLOCAT "An error occurred - allocation failure\n"
 #define ERROR_LOAD_IMAGE "Image cannot be loaded - ‘%s’:\n"
-#define ERROR_GENERAL "An error occured"
+#define ERROR_GENERAL "An error occurred"
 //MESSAGES
 #define MSG_EXITING "Exiting...\n"
 #define MSG_NEAREST_IMGS_GLOBAL "Nearest images using global descriptors:\n"
@@ -48,5 +51,5 @@ void getImagesSuffix(char* imagesSuffixInput);
 int getNumberOfBins();
 int getNumberOfFeatures();
 void validateCharAllocation(char** validationArray, int size);
-
+int getImageIndex(char* imagePrefix);
 #endif /* MAIN_AUX_H_ */

@@ -41,13 +41,15 @@ SPPoint** spGetRGBHist(const char* str, int imageIndex, int nBins) {
 	//separate the img in 3 places (b,g,r)
 	std::vector<Mat> bgr_planes;
 	split(src, bgr_planes);
-	float range[] = { 0, nBins };
+	//should be nBins but it causes error
+	float range[] = { 0, (float) nBins };
 	const float* histRange = { range };
 	Mat b_hist, g_hist, r_hist;
-	calcHist(&bgr_planes[0], 1, 0, Mat(), b_hist, 1, &nBins, &histRange);
+	calcHist(&bgr_planes[0], 1, 0, Mat(), r_hist, 1, &nBins, &histRange);
 	calcHist(&bgr_planes[1], 1, 0, Mat(), b_hist, 1, &nBins, &histRange);
-	calcHist(&bgr_planes[2], 1, 0, Mat(), b_hist, 1, &nBins, &histRange);
-	double data[nBins];
+	calcHist(&bgr_planes[2], 1, 0, Mat(), g_hist, 1, &nBins, &histRange);
+	//should be nBins but it causes error
+	double* data = (double*) malloc(nBins * sizeof(double));
 	for (int i = 0; i < nBins; i++) {
 		data[i] = r_hist.at<double>(i);
 	}
@@ -61,6 +63,7 @@ SPPoint** spGetRGBHist(const char* str, int imageIndex, int nBins) {
 		data[i] = b_hist.at<double>(i);
 	}
 	result[2] = spPointCreate(data, nBins, imageIndex);
+	free(data);
 	return result;
 }
 double spRGBHistL2Distance(SPPoint** rgbHistA, SPPoint** rgbHistB) {
@@ -110,14 +113,20 @@ SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
 		printf(ERROR_ALLOCAT);
 		return NULL;
 	}
-
+	double* data = (double*) malloc(descriptors.cols * sizeof(double));
+	if (data == NULL) {
+		printf(ERROR_ALLOCAT);
+		free(result);
+		return NULL;
+	}
 	for (int i = 0; i < descriptors.rows; i++) {
-		double data[descriptors.cols];
 		for (int j = 0; j < descriptors.cols; j++) {
 			data[j] = descriptors.at<double>(i, j);
 		}
 		result[i] = spPointCreate(data, descriptors.cols, imageIndex);
+		//Check if result[i] is null, if so, destroy everything
 	}
+	free(data);
 	return result;
 }
 int* spBestSIFTL2SquaredDistance(int kClosest, SPPoint* queryFeature,
@@ -146,19 +155,24 @@ int* spBestSIFTL2SquaredDistance(int kClosest, SPPoint* queryFeature,
 	BPQueueElement* result = (BPQueueElement*) malloc(sizeof(BPQueueElement));
 	if (result == NULL) {
 		printf(ERROR_ALLOCAT);
-		//TODO - FREE ALL!
 		return NULL;
 	}
-	int* num = (int*) malloc(kClosest * sizeof(int));
+	int* distance = (int*) malloc(kClosest * sizeof(int));
+	if (distance == NULL) {
+		printf(ERROR_ALLOCAT);
+		free(result);
+		return NULL;
+	}
 	int queueSize = spBPQueueSize(kClosestQueue);
+	//extract kclosest indexes from queue
 	for (int i = 0; i < queueSize; i++) {
 		spBPQueuePeek(kClosestQueue, result);
 		spBPQueueDequeue(kClosestQueue);
-		printf("%d\n",result->index);
-		num[i] = result->index;
+		//printf("%d\n",result->index);
+		distance[i] = result->index;
 	}
 
-	return num;
+	return distance;
 
 }
 

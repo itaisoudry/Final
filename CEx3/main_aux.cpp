@@ -33,7 +33,7 @@ void getImagesPrefix(char* imagesPrefix) {
 }
 
 int getNumberOfImages() {
-	int numberOfImages = -1;
+	int numberOfImages;
 	printf(INPUT_NUM_IMGS);
 	scanf("%d", &numberOfImages);
 	if (numberOfImages < MIN_NUM_OF_IMGS) {
@@ -90,10 +90,21 @@ void validateCharAllocation(char** validationArray, int size) {
 	if (found) {
 		for (index = 0; index < size; index++) {
 			if (validationArray[index] != NULL) {
-			free(validationArray[index]);
+				free(validationArray[index]);
+			}
 		}
+
 	}
 
 }
 
+int getImageIndex(char* imagePrefix) {
+	int result = 0;
+	int imageIndex = strcspn(imagePrefix, "img") + 3;
+	result = atoi(&imagePrefix[imageIndex]);
+	imageIndex++;
+	result = result + atoi(&imagePrefix[imageIndex]);
+	if (isalpha(result))
+		return result;
+	return -1;
 }
