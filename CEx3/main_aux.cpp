@@ -82,10 +82,11 @@ int getNumberOfFeatures() {
 
 int getHistogramsAndSiftDatabase(SPPoint*** RGBHistograms,
 		SPPoint*** SIFTDatabase, char* imagesPath, char* imagesSuffix,
-		char* imagesPrefix, int numOfImages, int numOfBins, int numOfFeatures) {
+		char* imagesPrefix, int numOfImages, int numOfBins, int numOfFeatures,
+		int* featuresPerImage) {
 	char imageIndex;
 	RGBHistograms = (SPPoint***) malloc(numOfImages * sizeof(SPPoint**));
-	int* featuresPerImage = (int*) malloc(numOfImages * sizeof(int));
+	featuresPerImage = (int*) malloc(numOfImages * sizeof(int));
 	if (featuresPerImage == NULL) {
 		printf(ERROR_ALLOCAT);
 		return 0;
@@ -150,6 +151,7 @@ int searchUsingGlobalFeatures(SPPoint** RGBQuery, SPPoint***RGBHistograms,
 		//check if msg returned?
 		spBPQueueEnqueue(queue, i, result);
 	}
+	//allocate queue element to peek inside the queue
 	BPQueueElement* element = (BPQueueElement*) malloc(sizeof(BPQueueElement));
 	if (element == NULL) {
 		printf(ERROR_ALLOCAT);
@@ -171,10 +173,48 @@ int searchUsingGlobalFeatures(SPPoint** RGBQuery, SPPoint***RGBHistograms,
 		spBPQueueDequeue(queue);
 		printf("%d", element->index);
 	}
+	//free allocated memory
 	printf("\n");
 	spBPQueueDestroy(queue);
 	free(element);
 	return 1;
+}
+int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
+		int nFeatures, int numOfImages, int* featuresPerImage) {
+	int* imagesHitCounter = (int*) malloc(numOfImages * sizeof(int));
+	if (imagesHitCounter == NULL) {
+		printf(ERROR_ALLOCAT);
+		return -1;
+	}
+	//initialize imagesHitCounter array
+	for (int i = 0; i < numOfImages; i++)
+		imagesHitCounter[i] = 0;
+	int* results;
+	for (int i = 0; i < nFeatures; i++) {
+		results = spBestSIFTL2SquaredDistance(MAX_LOCAL_HIST_SIZE, query[i],
+				SIFTDatabase, numOfImages, featuresPerImage);
+		if (results == NULL) {
+			free(imagesHitCounter);
+			return -1;
+		}
+		for (int j = 0; j < MAX_LOCAL_HIST_SIZE; j++) {
+			//in case we got less than MAX_LOCAL_HIST_SIZE
+			if (results[j] != NULL) {
+				imagesHitCounter[j]++;
+			}
+		}
+	}
+	qsort(imagesHitCounter, numOfImages, sizeof(int), comperator);
+	for(int i=MAX_LOCAL_HIST_SIZE-1;i>=0;i--){
+		printf("%d",imagesHitCounter[i]);
+	}
+	if (results != NULL)
+		free(results);
+	free(imagesHitCounter);
+
+}
+int comperator(const void * a, const void * b) {
+	return (*(int*) b - *(int*) a);
 }
 char* queryOrTerminate() {
 	printf(INPUT_QUERY_OR_TERMINATE);

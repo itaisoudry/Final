@@ -45,6 +45,7 @@
 #define NORMALIZE_FACTOR 0.33
 #define POINTS_ARR_SIZE 3
 #define MAX_GLOBAL_HIST_SIZE 5
+#define MAX_LOCAL_HIST_SIZE 5
 
 //functions
 void getImagesPath(char *imagePathInput);
@@ -56,6 +57,10 @@ int getNumberOfFeatures();
 void validateCharAllocation(char** validationArray, int size);
 void destroyDatabases(SPPoint*** arrayToDestroy, int size);
 void destroyInputs(char* imagesPath, char* imagesPrefix, char* imagesSuffix);
+int searchUsingGlobalFeatures(SPPoint** RGBQuery, SPPoint***RGBHistograms,
+		int numOfImages);
+int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
+		int nFeatures, int numOfImages,int* featuresPerImage);
 char* queryOrTerminate();
 void validateCharAllocation(char** validationArray, int size);
 void destroy(SPPoint*** RGB, SPPoint*** SIFT, char* imagesPath,
@@ -65,6 +70,7 @@ void destroyDatabases(SPPoint*** arrayToDestroy, int size);
 void destroyInputs(char* imagesPath, char* imagesPrefix, char* imagesSuffix);
 void destroyValidationArray(char** validationArray, int size);
 void destroyHistOrSIFT(SPPoint** toDestroy);
+int comperator(const void * a, const void * b);
 
 /**
  * creates sift and histograms databases
@@ -73,5 +79,5 @@ void destroyHistOrSIFT(SPPoint** toDestroy);
 
 int getHistogramsAndSiftDatabase(SPPoint*** RGBHistograms,
 		SPPoint*** SIFTDatabase, char* imagesPath, char* imagesSuffix,
-		char* imagesPrefix, int numOfImages, int numOfBins, int numOfFeatures);
+		char* imagesPrefix, int numOfImages, int numOfBins, int numOfFeatures,int* featuresPerImage);
 #endif /* MAIN_AUX_H_ */

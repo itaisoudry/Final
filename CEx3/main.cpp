@@ -13,6 +13,7 @@ int main1() {
 	char* imagesPrefix = NULL;
 	SPPoint*** RGBHistograms = NULL;
 	SPPoint*** SIFTDatabase = NULL;
+	int* featuresPerImage;
 	int numOfImages, numOfBins, numOfFeatures, imageIndex;
 	//This array will contain pointers to be checked-if one of them is null, all of them will be set free from memory
 	char** validationArray = (char**) malloc(
@@ -40,7 +41,7 @@ int main1() {
 
 	int result = getHistogramsAndSiftDatabase(RGBHistograms, SIFTDatabase,
 			imagesPath, imagesSuffix, imagesPrefix, numOfImages, numOfBins,
-			numOfFeatures);
+			numOfFeatures,featuresPerImage);
 	if (result == 0) {
 		destroyInputs(imagesSuffix, imagesPrefix, imagesPath);
 	}
@@ -62,11 +63,20 @@ int main1() {
 					imagesPath, validationArray, numOfImages);
 			free(query);
 			if (RGBQuery != NULL)
-				destroyHistOrSIFT(RGBQuery)
+			destroyHistOrSIFT (RGBQuery)
 			return 0;
 		}
-		searchUsingGlobalFeatures(RGBQuery,RGBHistograms,numOfImages);
-
+		int result = searchUsingGlobalFeatures(RGBQuery, RGBHistograms,
+				numOfImages);
+		//result = -1 means error occurred inside the function
+		if (result == -1) {
+			destroy(RGBHistograms, SIFTDatabase, imagesSuffix, imagesPrefix,
+					imagesPath, validationArray, numOfImages);
+			free(query);
+			destroyHistOrSIFT (RGBQuery)
+			return 0;
+		}
+		result = searchUsingLocalFeatures(SIFTQuery,SIFTDatabase,nFeatures,numOfImages,featuresPerImage);
 
 	}
 	printf("%d , %d , %d", numOfImages, numOfBins, numOfFeatures);
