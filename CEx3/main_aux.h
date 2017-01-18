@@ -44,6 +44,7 @@
 #define MIN_NUM_OF_FEATURES 1
 #define NORMALIZE_FACTOR 0.33
 #define POINTS_ARR_SIZE 3
+#define MAX_GLOBAL_HIST_SIZE 5
 
 //functions
 void getImagesPath(char *imagePathInput);

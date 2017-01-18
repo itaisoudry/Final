@@ -137,12 +137,44 @@ int getHistogramsAndSiftDatabase(SPPoint*** RGBHistograms,
 
 	return 1;
 }
-void searchUsingGlobalFeatures(SPPoint** RGBQuery,SPPoint***RGBHistograms,int numOfImages){
-
-	for(int i=0;i<numOfImages;i++){
-
+//return 0 if error occured
+int searchUsingGlobalFeatures(SPPoint** RGBQuery, SPPoint***RGBHistograms,
+		int numOfImages) {
+	SPBPQueue* queue = spBPQueueCreate(MAX_GLOBAL_HIST_SIZE);
+	if (queue == NULL) {
+		printf(ERROR_ALLOCAT);
+		return 0;
 	}
-
+	for (int i = 0; i < numOfImages; i++) {
+		double result = spRGBHistL2Distance(RGBQuery, RGBHistograms[i]);
+		//check if msg returned?
+		spBPQueueEnqueue(queue, i, result);
+	}
+	BPQueueElement* element = (BPQueueElement*) malloc(sizeof(BPQueueElement));
+	if (element == NULL) {
+		printf(ERROR_ALLOCAT);
+		spBPQueueDestroy(queue);
+		return -1;
+	}
+	printf(MSG_NEAREST_IMGS_GLOBAL);
+	for (int i = 0; i < MAX_GLOBAL_HIST_SIZE; i++) {
+		//if queue is empty and there are less than 5 images, break.
+		if (spBPQueueIsEmpty(queue)) {
+			spBPQueueDestroy(queue);
+			free(element);
+			printf("\n");
+			return 1;
+		}
+		if (i != 0)
+			printf(",");
+		spBPQueuePeek(queue, element);
+		spBPQueueDequeue(queue);
+		printf("%d", element->index);
+	}
+	printf("\n");
+	spBPQueueDestroy(queue);
+	free(element);
+	return 1;
 }
 char* queryOrTerminate() {
 	printf(INPUT_QUERY_OR_TERMINATE);
