@@ -108,3 +108,7 @@ int getImageIndex(char* imagePrefix) {
 		return result;
 	return -1;
 }
+
+int getQueryImagePath(){
+
+}

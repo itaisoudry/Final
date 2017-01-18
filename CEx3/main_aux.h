@@ -13,8 +13,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "SPPoint.h"
-#include "SPBPriorityQueue.h"
 #include "sp_image_proc_util.h"
 
 //Input
@@ -44,6 +42,9 @@
 #define MAX_NUM_OF_BINS 255
 #define MIN_NUM_OF_IMGS 1
 #define MIN_NUM_OF_FEATURES 1
+#define NORMALIZE_FACTOR 0.33
+#define POINTS_ARR_SIZE 3
+
 //functions
 void getImagesPath(char *imagePathInput);
 void getImagesPrefix(char *imagesPrefix);

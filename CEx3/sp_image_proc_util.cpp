@@ -7,9 +7,6 @@
 
 #include "sp_image_proc_util.h"
 #include "main_aux.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include <opencv2/highgui.hpp> //imshow, drawKeypoints, waitKey
 #include <opencv2/imgproc.hpp>
@@ -23,11 +20,10 @@
 extern "C" {
 #include "SPBPriorityQueue.h"
 }
-#define NORMALIZE_FACTOR 0.33
 using namespace cv;
 SPPoint** spGetRGBHist(const char* str, int imageIndex, int nBins) {
 	cv::Mat src;
-	SPPoint** result = (SPPoint**) malloc(3 * sizeof(SPPoint*));
+	SPPoint** result = (SPPoint**) malloc(POINTS_ARR_SIZE * sizeof(SPPoint*));
 	if (str == NULL || nBins <= 0 || imageIndex <= 0) {
 		printf(ERROR_GENERAL);
 		return NULL;
