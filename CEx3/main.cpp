@@ -7,7 +7,7 @@
  */
 #include "main_aux.h"
 
-int main1() {
+int main() {
 	char* imagesPath = NULL;
 	char* imagesSuffix = NULL;
 	char* imagesPrefix = NULL;

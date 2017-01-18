@@ -204,10 +204,15 @@ int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
 			}
 		}
 	}
+	//quick sort in descending order using comperator
 	qsort(imagesHitCounter, numOfImages, sizeof(int), comperator);
-	for(int i=MAX_LOCAL_HIST_SIZE-1;i>=0;i--){
-		printf("%d",imagesHitCounter[i]);
+	printf(MSG_NEAREST_IMGS_LOCAL);
+	for (int i = 0; i < MAX_LOCAL_HIST_SIZE && i < numOfImages; i++) {
+		if (i != 0)
+			printf(",");
+		printf("%d", imagesHitCounter[i]);
 	}
+	printf("\n");
 	if (results != NULL)
 		free(results);
 	free(imagesHitCounter);

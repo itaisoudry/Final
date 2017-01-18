@@ -39,7 +39,7 @@ void spBestSIFTL2SquaredDistanceTest() {
 	else
 		printf("FAILED\n");
 }
-int main() {
+int main1() {
 	spGetSiftDescriptorsTest();
 	spBestSIFTL2SquaredDistanceTest();
 }
