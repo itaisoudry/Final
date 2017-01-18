@@ -7,9 +7,6 @@
 
 #include "sp_image_proc_util.h"
 #include "main_aux.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include <opencv2/highgui.hpp> //imshow, drawKeypoints, waitKey
 #include <opencv2/imgproc.hpp>
@@ -20,6 +17,7 @@
 #include <opencv2/features2d.hpp>
 
 #include <cstdio>
+
 #define NORMALIZE_FACTOR 0.33
 #define HIST_NUM 3
 #define PIXELS 256
@@ -78,19 +76,21 @@ SPPoint** spGetRGBHist(const char* str, int imageIndex, int nBins){
 				}
 		free(data);
 		return result;
-}
-double spRGBHistL2Distance(SPPoint** rgbHistA, SPPoint** rgbHistB){
 
-		double result;
-		double sumR,sumG,sumB;
-		sumR = spPointL2SquaredDistance(rgbHistA[0],rgbHistB[0]);
-		sumG = spPointL2SquaredDistance(rgbHistA[1],rgbHistB[1]);
-		sumB = spPointL2SquaredDistance(rgbHistA[2],rgbHistB[2]);
+}
+double spRGBHistL2Distance(SPPoint** rgbHistA, SPPoint** rgbHistB) {
+
+	double result;
+	double sumR, sumG, sumB;
+	sumR = spPointL2SquaredDistance(rgbHistA[0], rgbHistB[0]);
+	sumG = spPointL2SquaredDistance(rgbHistA[1], rgbHistB[1]);
+	sumB = spPointL2SquaredDistance(rgbHistA[2], rgbHistB[2]);
+
 
 		result = NORMALIZE_FACTOR*sumR +NORMALIZE_FACTOR*sumG + NORMALIZE_FACTOR*sumB;
 		return result;
-}
 
+}
 
 SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
 		int nFeaturesToExtract, int *nFeatures) {
@@ -100,7 +100,6 @@ SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
 	std::vector<cv::KeyPoint> keyPoints;
 	//Feature values will be stored in ds1;
 	cv::Mat descriptors;
-	int index = 0;
 	if (str == NULL || nFeatures == NULL || nFeaturesToExtract <= 0) {
 		printf(ERROR_GENERAL);
 		return NULL;
@@ -127,30 +126,66 @@ SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
 		printf(ERROR_ALLOCAT);
 		return NULL;
 	}
-
+	double* data = (double*) malloc(descriptors.cols * sizeof(double));
+	if (data == NULL) {
+		printf(ERROR_ALLOCAT);
+		free(result);
+		return NULL;
+	}
 	for (int i = 0; i < descriptors.rows; i++) {
-		double data[descriptors.cols];
 		for (int j = 0; j < descriptors.cols; j++) {
 			data[j] = descriptors.at<double>(i, j);
 		}
 		result[i] = spPointCreate(data, descriptors.cols, imageIndex);
+		//Check if result[i] is null, if so, destroy everything
 	}
+	free(data);
 	return result;
 }
 int* spBestSIFTL2SquaredDistance(int kClosest, SPPoint* queryFeature,
 		SPPoint*** databaseFeatures, int numberOfImages,
 		int* nFeaturesPerImage) {
-
+	SPBPQueue* kClosestQueue;
 	if (queryFeature == NULL || databaseFeatures == NULL
 			|| nFeaturesPerImage == NULL || numberOfImages <= 1) {
 		printf(ERROR_GENERAL);
 		return NULL;
 	}
-	int* num = (int*)malloc(sizeof(int));
-	*num=1;
-	return num;
+	kClosestQueue = spBPQueueCreate(kClosest);
+	if (kClosestQueue == NULL) {
+		printf(ERROR_GENERAL);
+		return NULL;
+	}
+	//for every image
+	for (int i = 0; i < numberOfImages; i++) {
+		//scan all features and calc L2 distance with query features
+		for (int j = 0; j < nFeaturesPerImage[i]; j++) {
+			double L2Distance = spPointL2SquaredDistance(databaseFeatures[i][j],
+					queryFeature);
+			spBPQueueEnqueue(kClosestQueue, i, L2Distance);
+		}
+	}
+	BPQueueElement* result = (BPQueueElement*) malloc(sizeof(BPQueueElement));
+	if (result == NULL) {
+		printf(ERROR_ALLOCAT);
+		return NULL;
+	}
+	int* distance = (int*) malloc(kClosest * sizeof(int));
+	if (distance == NULL) {
+		printf(ERROR_ALLOCAT);
+		free(result);
+		return NULL;
+	}
+	int queueSize = spBPQueueSize(kClosestQueue);
+	//extract kclosest indexes from queue
+	for (int i = 0; i < queueSize; i++) {
+		spBPQueuePeek(kClosestQueue, result);
+		spBPQueueDequeue(kClosestQueue);
+		//printf("%d\n",result->index);
+		distance[i] = result->index;
+	}
 
-
+	return distance;
 
 }
 

@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+#include "sp_image_proc_util.h"
 
 //Input
 #define INPUT_IMG_DIRECTORY_PATH "Enter images directory path:\n"
@@ -28,7 +30,7 @@
 #define ERROR_NUM_OF_FEATURES "An error occurred - invalid number of features\n"
 #define ERROR_ALLOCAT "An error occurred - allocation failure\n"
 #define ERROR_LOAD_IMAGE "Image cannot be loaded - ‘%s’:\n"
-#define ERROR_GENERAL "An error occured"
+#define ERROR_GENERAL "An error occurred"
 //MESSAGES
 #define MSG_EXITING "Exiting...\n"
 #define MSG_NEAREST_IMGS_GLOBAL "Nearest images using global descriptors:\n"
@@ -40,6 +42,9 @@
 #define MAX_NUM_OF_BINS 255
 #define MIN_NUM_OF_IMGS 1
 #define MIN_NUM_OF_FEATURES 1
+#define NORMALIZE_FACTOR 0.33
+#define POINTS_ARR_SIZE 3
+
 //functions
 void getImagesPath(char *imagePathInput);
 void getImagesPrefix(char *imagesPrefix);
@@ -48,5 +53,5 @@ void getImagesSuffix(char* imagesSuffixInput);
 int getNumberOfBins();
 int getNumberOfFeatures();
 void validateCharAllocation(char** validationArray, int size);
-
+int getImageIndex(char* imagePrefix);
 #endif /* MAIN_AUX_H_ */

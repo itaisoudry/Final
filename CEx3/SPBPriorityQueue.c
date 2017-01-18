@@ -175,8 +175,10 @@ SP_BPQUEUE_MSG spBPQueuePeek(SPBPQueue* source, BPQueueElement* res) {
 	if (source->size == -1) {
 		return SP_BPQUEUE_EMPTY;
 	}
-	BPQueueElement* firstElement = &source->queue[source->start];
-	*res = *firstElement;
+	//BPQueueElement* firstElement = source->queue[source->start];
+	res->index = source->queue[source->start].index;
+	res->value = source->queue[source->start].value;
+	//printf("%d\n",res->index);
 	return SP_BPQUEUE_SUCCESS;
 }
 
