@@ -41,7 +41,7 @@ int main() {
 
 	int result = getHistogramsAndSiftDatabase(RGBHistograms, SIFTDatabase,
 			imagesPath, imagesSuffix, imagesPrefix, numOfImages, numOfBins,
-			numOfFeatures,featuresPerImage);
+			numOfFeatures, featuresPerImage);
 	if (result == 0) {
 		destroyInputs(imagesSuffix, imagesPrefix, imagesPath);
 	}
@@ -58,12 +58,12 @@ int main() {
 		SPPoint** SIFTQuery = spGetSiftDescriptors(query, -1, numOfFeatures,
 				&nFeatures);
 		if (RGBQuery == NULL || SIFTQuery == NULL) {
-			printf (ERROR_ALOCAT);
+			printf(ERROR_ALLOCAT);
 			destroy(RGBHistograms, SIFTDatabase, imagesSuffix, imagesPrefix,
 					imagesPath, validationArray, numOfImages);
 			free(query);
 			if (RGBQuery != NULL)
-			destroyHistOrSIFT (RGBQuery)
+				destroyHistOrSIFT(RGBQuery);
 			return 0;
 		}
 		int result = searchUsingGlobalFeatures(RGBQuery, RGBHistograms,
@@ -73,14 +73,17 @@ int main() {
 			destroy(RGBHistograms, SIFTDatabase, imagesSuffix, imagesPrefix,
 					imagesPath, validationArray, numOfImages);
 			free(query);
-			destroyHistOrSIFT (RGBQuery)
+			destroyHistOrSIFT(RGBQuery);
 			return 0;
 		}
-		result = searchUsingLocalFeatures(SIFTQuery,SIFTDatabase,nFeatures,numOfImages,featuresPerImage);
-
+		result = searchUsingLocalFeatures(SIFTQuery, SIFTDatabase, nFeatures,
+				numOfImages, featuresPerImage);
+		destroyHistOrSIFT(RGBQuery);
+		destroyHistOrSIFT(SIFTQuery);
 	}
-	printf("%d , %d , %d", numOfImages, numOfBins, numOfFeatures);
-
+	destroy(RGBHistograms, SIFTDatabase, imagesSuffix, imagesPrefix, imagesPath,
+			validationArray, numOfImages);
+	free(query);
 	return 0;
 }
 
