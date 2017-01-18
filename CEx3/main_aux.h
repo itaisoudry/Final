@@ -15,6 +15,7 @@
 #include <ctype.h>
 #include "SPPoint.h"
 #include "SPBPriorityQueue.h"
+#include "sp_image_proc_util.h"
 
 //Input
 #define INPUT_IMG_DIRECTORY_PATH "Enter images directory path:\n"
