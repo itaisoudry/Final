@@ -53,5 +53,24 @@ void getImagesSuffix(char* imagesSuffixInput);
 int getNumberOfBins();
 int getNumberOfFeatures();
 void validateCharAllocation(char** validationArray, int size);
-int getImageIndex(char* imagePrefix);
+void destroyDatabases(SPPoint*** arrayToDestroy, int size);
+void destroyInputs(char* imagesPath, char* imagesPrefix, char* imagesSuffix);
+char* queryOrTerminate();
+void validateCharAllocation(char** validationArray, int size);
+void destroy(SPPoint*** RGB, SPPoint*** SIFT, char* imagesPath,
+		char*imagesPrefix, char*imagesSuffix, char** validationArray,
+		int numOfImages);
+void destroyDatabases(SPPoint*** arrayToDestroy, int size);
+void destroyInputs(char* imagesPath, char* imagesPrefix, char* imagesSuffix);
+void destroyValidationArray(char** validationArray, int size);
+void destroyHistOrSIFT(SPPoint** toDestroy);
+
+/**
+ * creates sift and histograms databases
+ * @return 0 if error occurred 1 otherwise
+ */
+
+int getHistogramsAndSiftDatabase(SPPoint*** RGBHistograms,
+		SPPoint*** SIFTDatabase, char* imagesPath, char* imagesSuffix,
+		char* imagesPrefix, int numOfImages, int numOfBins, int numOfFeatures);
 #endif /* MAIN_AUX_H_ */
