@@ -84,10 +84,10 @@ void getDatabasesTest() {
 	}
 	result = searchUsingLocalFeatures(SIFTQuery, SIFTDatabase, nFeatures,
 			numOfImages, featuresPerImage);
-	if (result == -1) {
-		printf("FAILED");
+	if (result != -1) {
+		printf("SUCCESS");
 	}
-	printf("SUCCESS");
+
 }
 int main() {
 //	spGetSiftDescriptorsTest();

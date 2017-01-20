@@ -48,7 +48,7 @@ SPPoint** spGetRGBHist(const char* str, int imageIndex, int nBins) {
 	calcHist(&bgr_planes[2], 1, 0, Mat(), r_hist, 1, &nBins, &histRange);
 	double* data = (double*) malloc(nBins * sizeof(double));
 	for (int i = 0; i < nBins; i++) {
-		data[i] = b_hist.at<double>(i);
+		data[i] = b_hist.at<float>(0,i);
 	}
 	result[0] = spPointCreate(data, nBins, imageIndex);
 	if (result[0] == NULL) {
@@ -56,7 +56,7 @@ SPPoint** spGetRGBHist(const char* str, int imageIndex, int nBins) {
 		return NULL;
 	}
 	for (int i = 0; i < nBins; i++) {
-		data[i] = g_hist.at<double>(i);
+		data[i] = g_hist.at<float>(0,i);
 	}
 	result[1] = spPointCreate(data, nBins, imageIndex);
 	if (result[1] == NULL) {
@@ -65,7 +65,7 @@ SPPoint** spGetRGBHist(const char* str, int imageIndex, int nBins) {
 		return NULL;
 	}
 	for (int i = 0; i < nBins; i++) {
-		data[i] = r_hist.at<double>(i);
+		data[i] = r_hist.at<float>(0,i);
 	}
 	result[2] = spPointCreate(data, nBins, imageIndex);
 	if (result[2] == NULL) {
@@ -80,15 +80,15 @@ SPPoint** spGetRGBHist(const char* str, int imageIndex, int nBins) {
 }
 double spRGBHistL2Distance(SPPoint** rgbHistA, SPPoint** rgbHistB) {
 
-	double result;
+	double result=0;
 	double sumR, sumG, sumB;
+
 	sumR = spPointL2SquaredDistance(rgbHistA[0], rgbHistB[0]);
 	sumG = spPointL2SquaredDistance(rgbHistA[1], rgbHistB[1]);
 	sumB = spPointL2SquaredDistance(rgbHistA[2], rgbHistB[2]);
 
-	result = NORMALIZE_FACTOR * sumR + NORMALIZE_FACTOR * sumG
-			+ NORMALIZE_FACTOR * sumB;
-	return result;
+	result =   sumR + sumG+  sumB;
+	return NORMALIZE_FACTOR*result;
 
 }
 
@@ -126,7 +126,7 @@ SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
 		printf(ERROR_ALLOCAT);
 		return NULL;
 	}
-	double* data = (double*) malloc(descriptors.cols * sizeof(double));
+	double* data = (double*) malloc(NUM_OF_FEATURES * sizeof(double));
 	if (data == NULL) {
 		printf(ERROR_ALLOCAT);
 		free(result);
@@ -134,7 +134,7 @@ SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
 	}
 	for (int i = 0; i < descriptors.rows; i++) {
 		for (int j = 0; j < descriptors.cols; j++) {
-			data[j] = descriptors.at<float>(i, j);
+			data[j] = descriptors.at<float>(i,j);
 		}
 		result[i] = spPointCreate(data, NUM_OF_FEATURES, imageIndex);
 		//Check if result[i] is null, if so, destroy everything
@@ -170,7 +170,8 @@ int* spBestSIFTL2SquaredDistance(int kClosest, SPPoint* queryFeature,
 		for (int j = 0; j < nFeaturesPerImage[i]; j++) {
 			double L2Distance = spPointL2SquaredDistance(databaseFeatures[i][j],
 					queryFeature);
-			spBPQueueEnqueue(kClosestQueue, spPointGetIndex(databaseFeatures[i][j]), L2Distance);
+			spBPQueueEnqueue(kClosestQueue,
+					spPointGetIndex(databaseFeatures[i][j]), L2Distance);
 		}
 	}
 	BPQueueElement* result = (BPQueueElement*) malloc(sizeof(BPQueueElement));
