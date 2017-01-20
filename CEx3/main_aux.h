@@ -14,6 +14,9 @@
 #include <string.h>
 #include <ctype.h>
 #include "sp_image_proc_util.h"
+extern "C"{
+#include "SPBPriorityQueue.h"
+}
 
 //Input
 #define INPUT_IMG_DIRECTORY_PATH "Enter images directory path:\n"
@@ -48,10 +51,10 @@
 #define MAX_LOCAL_HIST_SIZE 5
 
 //functions
-void getImagesPath(char *imagePathInput);
-void getImagesPrefix(char *imagesPrefix);
+void getImagesPath(char** imagePathInput);
+void getImagesPrefix(char** imagesPrefix);
+void getImagesSuffix(char** imagesSuffixInput);
 int getNumberOfImages();
-void getImagesSuffix(char* imagesSuffixInput);
 int getNumberOfBins();
 int getNumberOfFeatures();
 void validateCharAllocation(char** validationArray, int size);

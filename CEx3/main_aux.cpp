@@ -7,30 +7,33 @@
 
 #include "main_aux.h"
 
-void getImagesPath(char* imagePathInput) {
-	imagePathInput = (char*) malloc(MAX_STRING * sizeof(char));
-	if (imagePathInput == NULL) {
+void getImagesPath(char** imagePathInput) {
+	*imagePathInput = (char*) malloc(MAX_STRING * sizeof(char));
+	if (*imagePathInput == NULL) {
 		printf(ERROR_ALLOCAT);
 		return;
 	}
 	printf(INPUT_IMG_DIRECTORY_PATH);
-	if (fgets(imagePathInput, MAX_STRING, stdin) == NULL) {
+	if (fgets(*imagePathInput, MAX_STRING, stdin) == NULL) {
+		free(*imagePathInput);
 		printf(ERROR_GENERAL);
 	}
-
+	strtok(*imagePathInput, "\n");
 }
 
-void getImagesPrefix(char* imagesPrefix) {
-	imagesPrefix = (char*) malloc(MAX_STRING * sizeof(char));
-	if (imagesPrefix == NULL) {
+void getImagesPrefix(char** imagesPrefix) {
+	*imagesPrefix = (char*) malloc(MAX_STRING * sizeof(char));
+	if (*imagesPrefix == NULL) {
 		printf(ERROR_ALLOCAT);
 		return;
 	}
 	printf(INPUT_IMG_PREFIX);
-	if (fgets(imagesPrefix, MAX_STRING, stdin) == NULL) {
-		free(imagesPrefix);
+	if (fgets(*imagesPrefix, MAX_STRING, stdin) == NULL) {
+		free(*imagesPrefix);
 		printf(ERROR_GENERAL);
 	}
+	strtok(*imagesPrefix, "\n");
+
 }
 
 int getNumberOfImages() {
@@ -42,19 +45,22 @@ int getNumberOfImages() {
 		//-1 means the user input was not valid
 		numberOfImages = -1;
 	}
+	//scanf leaves a \n afterwards which is messing up the fgets function
+	getchar();
 	return numberOfImages;
 }
-void getImagesSuffix(char* imagesSuffixInput) {
-	imagesSuffixInput = (char*) malloc(MAX_STRING * sizeof(char));
+void getImagesSuffix(char** imagesSuffixInput) {
+	*imagesSuffixInput = (char*) malloc(MAX_STRING * sizeof(char));
 	if (imagesSuffixInput == NULL) {
 		printf(ERROR_ALLOCAT);
 		return;
 	}
 	printf(INPUT_IMG_SUFFIX);
-	if (fgets(imagesSuffixInput, MAX_STRING, stdin) == NULL) {
-		free(imagesSuffixInput);
+	if (fgets(*imagesSuffixInput, MAX_STRING, stdin) == NULL) {
+		free(*imagesSuffixInput);
 		printf(ERROR_GENERAL);
 	}
+	strtok(*imagesSuffixInput, "\n");
 }
 
 int getNumberOfBins() {
@@ -109,17 +115,16 @@ int getHistogramsAndSiftDatabase(SPPoint*** RGBHistograms,
 		free(SIFTDatabase);
 		return 0;
 	}
-
+	char buffer[2];
 	for (int i = 0; i < numOfImages; i++) {
-		imageIndex = i + '0';
 		strcpy(fullImagePath, imagesPath);
 		strcat(fullImagePath, imagesPrefix);
-		strcat(fullImagePath, &imageIndex);
+		sprintf(buffer,"%d",i);
+		strcat(fullImagePath, buffer);
 		strcat(fullImagePath, imagesSuffix);
 
 		RGBHistograms[i] = spGetRGBHist(fullImagePath, i, numOfBins);
 		if (RGBHistograms[i] == NULL) {
-			printf(ERROR_ALLOCAT);
 			destroyDatabases(RGBHistograms, i - 1);
 			free(featuresPerImage);
 			return 0;
@@ -199,7 +204,7 @@ int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
 		}
 		for (int j = 0; j < MAX_LOCAL_HIST_SIZE; j++) {
 			//in case we got less than MAX_LOCAL_HIST_SIZE
-			if (results[j] != NULL) {
+			if (&results[j] != NULL) {
 				imagesHitCounter[j]++;
 			}
 		}
@@ -286,7 +291,9 @@ void destroyInputs(char* imagesPath, char* imagesPrefix, char* imagesSuffix) {
 	free(imagesPrefix);
 }
 void destroyValidationArray(char** validationArray, int size) {
-	for (int index = 0; index < size; index++) {
+	int index;
+	//if size==1 noting were allocated...
+	for (index = 0; index < size; index++) {
 		if (validationArray[index] != NULL) {
 			free(validationArray[index]);
 		}

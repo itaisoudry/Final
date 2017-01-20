@@ -7,14 +7,14 @@
  */
 #include "main_aux.h"
 
-int main() {
+int main1() {
 	char* imagesPath = NULL;
 	char* imagesSuffix = NULL;
 	char* imagesPrefix = NULL;
 	SPPoint*** RGBHistograms = NULL;
 	SPPoint*** SIFTDatabase = NULL;
 	int* featuresPerImage;
-	int numOfImages, numOfBins, numOfFeatures, imageIndex;
+	int numOfImages, numOfBins, numOfFeatures;
 	//This array will contain pointers to be checked-if one of them is null, all of them will be set free from memory
 	char** validationArray = (char**) malloc(
 	CHAR_ALLOCATION_IN_MAIN * sizeof(char*));
@@ -23,16 +23,16 @@ int main() {
 		return 0;
 	}
 
-	getImagesPath(imagesPath);
+	getImagesPath(&imagesPath);
 	validationArray[0] = imagesPath;
 	validateCharAllocation(validationArray, 1);
 
-	getImagesPrefix(imagesPrefix);
+	getImagesPrefix(&imagesPrefix);
 	validationArray[1] = imagesPrefix;
 	validateCharAllocation(validationArray, 2);
 
 	numOfImages = getNumberOfImages();
-	getImagesSuffix(imagesSuffix);
+	getImagesSuffix(&imagesSuffix);
 	validationArray[2] = imagesSuffix;
 	validateCharAllocation(validationArray, 3);
 
@@ -44,6 +44,7 @@ int main() {
 			numOfFeatures, featuresPerImage);
 	if (result == 0) {
 		destroyInputs(imagesSuffix, imagesPrefix, imagesPath);
+		return 0;
 	}
 	char* query = queryOrTerminate();
 	if (query == NULL) {
