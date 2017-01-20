@@ -86,24 +86,23 @@ int getNumberOfFeatures() {
 	return numberOfFeatures;
 }
 
-int getHistogramsAndSiftDatabase(SPPoint*** RGBHistograms,
-		SPPoint*** SIFTDatabase, char* imagesPath, char* imagesSuffix,
+int getHistogramsAndSiftDatabase(SPPoint**** RGBHistograms,
+		SPPoint**** SIFTDatabase, char* imagesPath, char* imagesSuffix,
 		char* imagesPrefix, int numOfImages, int numOfBins, int numOfFeatures,
 		int* featuresPerImage) {
-	char imageIndex;
-	RGBHistograms = (SPPoint***) malloc(numOfImages * sizeof(SPPoint**));
+	*RGBHistograms = (SPPoint***) malloc(numOfImages * sizeof(SPPoint**));
 	featuresPerImage = (int*) malloc(numOfImages * sizeof(int));
 	if (featuresPerImage == NULL) {
 		printf(ERROR_ALLOCAT);
 		return 0;
 	}
-	if (RGBHistograms == NULL) {
+	if (*RGBHistograms == NULL) {
 		printf(ERROR_ALLOCAT);
 		free(featuresPerImage);
 		return 0;
 	}
-	SIFTDatabase = (SPPoint***) malloc(numOfImages * sizeof(SPPoint**));
-	if (SIFTDatabase == NULL) {
+	*SIFTDatabase = (SPPoint***) malloc(numOfImages * sizeof(SPPoint**));
+	if (*SIFTDatabase == NULL) {
 		printf(ERROR_ALLOCAT);
 		free(RGBHistograms);
 		return 0;
@@ -111,8 +110,8 @@ int getHistogramsAndSiftDatabase(SPPoint*** RGBHistograms,
 	char* fullImagePath = (char*) malloc(MAX_STRING * sizeof(char));
 	if (fullImagePath == NULL) {
 		printf(ERROR_ALLOCAT);
-		free(RGBHistograms);
-		free(SIFTDatabase);
+		free(*RGBHistograms);
+		free(*SIFTDatabase);
 		return 0;
 	}
 	char buffer[2];
@@ -123,21 +122,20 @@ int getHistogramsAndSiftDatabase(SPPoint*** RGBHistograms,
 		strcat(fullImagePath, buffer);
 		strcat(fullImagePath, imagesSuffix);
 
-		RGBHistograms[i] = spGetRGBHist(fullImagePath, i, numOfBins);
-		if (RGBHistograms[i] == NULL) {
-			destroyDatabases(RGBHistograms, i - 1);
+		(*RGBHistograms)[i] = spGetRGBHist(fullImagePath, i, numOfBins);
+		if ((*RGBHistograms)[i] == NULL) {
+			destroyDatabases(*RGBHistograms, i - 1);
 			free(featuresPerImage);
 			return 0;
 		}
-		SIFTDatabase[i] = spGetSiftDescriptors(fullImagePath, i, numOfFeatures,
+		(*SIFTDatabase)[i] = spGetSiftDescriptors(fullImagePath, i, numOfFeatures,
 				&featuresPerImage[i]);
-		if (SIFTDatabase[i] == NULL) {
+		if ((*SIFTDatabase)[i] == NULL) {
 			printf(ERROR_ALLOCAT);
-			destroyDatabases(SIFTDatabase, i);
+			destroyDatabases(*SIFTDatabase, i);
 			free(featuresPerImage);
 			return 0;
 		}
-		//If allocation failed - destroy everything
 
 	}
 

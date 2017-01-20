@@ -80,7 +80,7 @@ int comperator(const void * a, const void * b);
  * @return 0 if error occurred 1 otherwise
  */
 
-int getHistogramsAndSiftDatabase(SPPoint*** RGBHistograms,
-		SPPoint*** SIFTDatabase, char* imagesPath, char* imagesSuffix,
+int getHistogramsAndSiftDatabase(SPPoint**** RGBHistograms,
+		SPPoint**** SIFTDatabase, char* imagesPath, char* imagesSuffix,
 		char* imagesPrefix, int numOfImages, int numOfBins, int numOfFeatures,int* featuresPerImage);
 #endif /* MAIN_AUX_H_ */

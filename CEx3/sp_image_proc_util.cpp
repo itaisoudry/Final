@@ -21,6 +21,7 @@
 #define NORMALIZE_FACTOR 0.33
 #define HIST_NUM 3
 #define PIXELS 256
+#define NUM_OF_FEATURES 128
 using namespace cv;
 SPPoint** spGetRGBHist(const char* str, int imageIndex, int nBins) {
 	cv::Mat src;
@@ -44,7 +45,7 @@ SPPoint** spGetRGBHist(const char* str, int imageIndex, int nBins) {
 
 	calcHist(&bgr_planes[0], 1, 0, Mat(), b_hist, 1, &nBins, &histRange);
 	calcHist(&bgr_planes[1], 1, 0, Mat(), g_hist, 1, &nBins, &histRange);
-	calcHist(&bgr_planes[2], 1, 0, Mat(), g_hist, 1, &nBins, &histRange);
+	calcHist(&bgr_planes[2], 1, 0, Mat(), r_hist, 1, &nBins, &histRange);
 	double* data = (double*) malloc(nBins * sizeof(double));
 	for (int i = 0; i < nBins; i++) {
 		data[i] = b_hist.at<double>(i);
@@ -133,10 +134,18 @@ SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
 	}
 	for (int i = 0; i < descriptors.rows; i++) {
 		for (int j = 0; j < descriptors.cols; j++) {
-			data[j] = descriptors.at<double>(i, j);
+			data[j] = descriptors.at<float>(i, j);
 		}
-		result[i] = spPointCreate(data, descriptors.cols, imageIndex);
+		result[i] = spPointCreate(data, NUM_OF_FEATURES, imageIndex);
 		//Check if result[i] is null, if so, destroy everything
+		if (result[i] == NULL) {
+			for (int index = 0; index < i; index++) {
+				free(result[index]);
+			}
+			free(result);
+			free(data);
+			return NULL;
+		}
 	}
 	free(data);
 	return result;
@@ -161,7 +170,7 @@ int* spBestSIFTL2SquaredDistance(int kClosest, SPPoint* queryFeature,
 		for (int j = 0; j < nFeaturesPerImage[i]; j++) {
 			double L2Distance = spPointL2SquaredDistance(databaseFeatures[i][j],
 					queryFeature);
-			spBPQueueEnqueue(kClosestQueue, i, L2Distance);
+			spBPQueueEnqueue(kClosestQueue, spPointGetIndex(databaseFeatures[i][j]), L2Distance);
 		}
 	}
 	BPQueueElement* result = (BPQueueElement*) malloc(sizeof(BPQueueElement));
@@ -185,6 +194,7 @@ int* spBestSIFTL2SquaredDistance(int kClosest, SPPoint* queryFeature,
 		distance[i] = result->index;
 	}
 	free(result);
+	spBPQueueDestroy(kClosestQueue);
 	return distance;
 
 }

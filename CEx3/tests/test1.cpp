@@ -13,7 +13,9 @@
 #define IMG1 "/home/soudry/git/CAssignment3/CEx3/images/img1.png"
 #define IMG2 "/home/soudry/git/CAssignment3/CEx3/images/img2.png"
 #define IMG3 "/home/soudry/git/CAssignment3/CEx3/images/img3.png"
-
+#define QUERYA "/home/soudry/git/CAssignment3/CEx3/queryA.png"
+#define QUERYB "/home/soudry/git/CAssignment3/CEx3/queryB.png"
+#define QUERYC "/home/soudry/git/CAssignment3/CEx3/queryC.png"
 void spGetSiftDescriptorsTest() {
 	int* num = (int*) malloc(sizeof(int));
 	*num = 0;
@@ -43,9 +45,9 @@ void spBestSIFTL2SquaredDistanceTest() {
 		printf("FAILED\n");
 }
 void getDatabasesTest() {
-	int numOfImages = 4;
-	int numOfBins = 3;
-	int numOfFeatures = 128;
+	int numOfImages = 17;
+	int numOfBins = 16;
+	int numOfFeatures = 100;
 	int* featuresPerImage = NULL;
 	char imagesPath[] = "/home/soudry/git/CAssignment3/CEx3/images/";
 	char imagesSuffix[] = ".png";
@@ -56,7 +58,7 @@ void getDatabasesTest() {
 			numOfImages * sizeof(SPPoint**));
 	;
 
-	int result = getHistogramsAndSiftDatabase(RGBHistograms, SIFTDatabase,
+	int result = getHistogramsAndSiftDatabase(&RGBHistograms, &SIFTDatabase,
 			imagesPath, imagesSuffix, imagesPrefix, numOfImages, numOfBins,
 			numOfFeatures, featuresPerImage);
 	if (result == 1)
@@ -66,9 +68,9 @@ void getDatabasesTest() {
 		return;
 	}
 
-	int nFeatures;
-	SPPoint** RGBQuery = spGetRGBHist(IMG0, -1, numOfBins);
-	SPPoint** SIFTQuery = spGetSiftDescriptors(IMG0, -1, numOfFeatures,
+	int nFeatures=-1;
+	SPPoint** RGBQuery = spGetRGBHist(QUERYA, 0, numOfBins);
+	SPPoint** SIFTQuery = spGetSiftDescriptors(QUERYA, 0, numOfFeatures,
 			&nFeatures);
 	if (RGBQuery == NULL || SIFTQuery == NULL) {
 		printf("FAILED");
@@ -85,6 +87,7 @@ void getDatabasesTest() {
 	if (result == -1) {
 		printf("FAILED");
 	}
+	printf("SUCCESS");
 }
 int main() {
 //	spGetSiftDescriptorsTest();
