@@ -39,10 +39,10 @@ int main1() {
 	numOfBins = getNumberOfBins();
 	numOfFeatures = getNumberOfFeatures();
 
-	int result = getHistogramsAndSiftDatabase(&RGBHistograms, &SIFTDatabase,
-			imagesPath, imagesSuffix, imagesPrefix, numOfImages, numOfBins,
-			numOfFeatures, featuresPerImage);
-	if (result == ERROR) {
+	featuresPerImage = getHistogramsAndSiftDatabase(&RGBHistograms,
+			&SIFTDatabase, imagesPath, imagesSuffix, imagesPrefix, numOfImages,
+			numOfBins, numOfFeatures);
+	if (featuresPerImage == NULL) {
 		destroyInputs(imagesSuffix, imagesPrefix, imagesPath);
 		return 0;
 	}

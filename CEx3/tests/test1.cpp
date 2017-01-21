@@ -48,7 +48,7 @@ void getDatabasesTest() {
 	int numOfImages = 17;
 	int numOfBins = 16;
 	int numOfFeatures = 100;
-	int* featuresPerImage = NULL;
+
 	char imagesPath[] = "/home/soudry/git/CAssignment3/CEx3/images/";
 	char imagesSuffix[] = ".png";
 	char imagesPrefix[] = "img";
@@ -58,17 +58,17 @@ void getDatabasesTest() {
 			numOfImages * sizeof(SPPoint**));
 	;
 
-	int result = getHistogramsAndSiftDatabase(&RGBHistograms, &SIFTDatabase,
+	int* featuresPerImage = getHistogramsAndSiftDatabase(&RGBHistograms, &SIFTDatabase,
 			imagesPath, imagesSuffix, imagesPrefix, numOfImages, numOfBins,
-			numOfFeatures, featuresPerImage);
-	if (result == 1)
-		printf("SUCCESS");
+			numOfFeatures);
+	if (featuresPerImage != NULL)
+		printf("SUCCESS\n");
 	else {
 		printf("FAILED");
 		return;
 	}
 
-	int nFeatures=-1;
+	int nFeatures = -1;
 	SPPoint** RGBQuery = spGetRGBHist(QUERYA, 0, numOfBins);
 	SPPoint** SIFTQuery = spGetSiftDescriptors(QUERYA, 0, numOfFeatures,
 			&nFeatures);
@@ -76,17 +76,17 @@ void getDatabasesTest() {
 		printf("FAILED");
 		return;
 	}
-	result = searchUsingGlobalFeatures(RGBQuery, RGBHistograms,
-			numOfImages);
-	if (result == -1) {
+	int result = searchUsingGlobalFeatures(RGBQuery, RGBHistograms, numOfImages);
+	if (result == ERROR) {
 		printf("FAILED");
 		return;
 	}
 	result = searchUsingLocalFeatures(SIFTQuery, SIFTDatabase, nFeatures,
 			numOfImages, featuresPerImage);
-	if (result != -1) {
+	if (result == ERROR) {
+		printf("FAILED");
+	} else
 		printf("SUCCESS");
-	}
 
 }
 int main() {

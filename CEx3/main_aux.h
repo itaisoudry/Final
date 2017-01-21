@@ -79,11 +79,10 @@ int comperator(const void * a, const void * b);
 
 /**
  * creates sift and histograms databases
- * @return 0 if error occurred 1 otherwise
+ * @return NULL if error occurred featuresPerImage otherwise
  */
 
-int getHistogramsAndSiftDatabase(SPPoint**** RGBHistograms,
+int* getHistogramsAndSiftDatabase(SPPoint**** RGBHistograms,
 		SPPoint**** SIFTDatabase, char* imagesPath, char* imagesSuffix,
-		char* imagesPrefix, int numOfImages, int numOfBins, int numOfFeatures,
-		int* featuresPerImage);
+		char* imagesPrefix, int numOfImages, int numOfBins, int numOfFeatures);
 #endif /* MAIN_AUX_H_ */
