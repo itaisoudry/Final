@@ -18,6 +18,7 @@ void getImagesPath(char** imagePathInput) {
 		free(*imagePathInput);
 		printf(ERROR_GENERAL);
 	}
+	//drops the \n added by fgets
 	strtok(*imagePathInput, "\n");
 }
 
@@ -32,6 +33,7 @@ void getImagesPrefix(char** imagesPrefix) {
 		free(*imagesPrefix);
 		printf(ERROR_GENERAL);
 	}
+	//drops the \n added by fgets
 	strtok(*imagesPrefix, "\n");
 
 }
@@ -39,11 +41,10 @@ void getImagesPrefix(char** imagesPrefix) {
 int getNumberOfImages() {
 	int numberOfImages;
 	printf(INPUT_NUM_IMGS);
-	scanf("%d", &numberOfImages);
-	if (numberOfImages < MIN_NUM_OF_IMGS) {
+	if (scanf("%d", &numberOfImages) == NULL || numberOfImages < MIN_NUM_OF_IMGS) {
 		printf(ERROR_NUM_OF_IMGS);
 		//-1 means the user input was not valid
-		numberOfImages = -1;
+		numberOfImages = ERROR;
 	}
 	//scanf leaves a \n afterwards which is messing up the fgets function
 	getchar();
@@ -66,22 +67,22 @@ void getImagesSuffix(char** imagesSuffixInput) {
 int getNumberOfBins() {
 	int numberOfBins = -1;
 	printf(INPUT_NUM_OF_BINS);
-	scanf("%d", &numberOfBins);
-	if (numberOfBins < MIN_NUM_OF_BINS || numberOfBins > MAX_NUM_OF_BINS) {
+	if (scanf("%d", &numberOfBins) == NULL || numberOfBins < MIN_NUM_OF_BINS
+			|| numberOfBins > MAX_NUM_OF_BINS) {
 		printf(ERROR_NUM_OF_BINS);
 		//-1 means the user input was not valid
-		numberOfBins = -1;
+		numberOfBins = ERROR;
 	}
 	return numberOfBins;
 }
 int getNumberOfFeatures() {
 	int numberOfFeatures = -1;
 	printf(INPUT_NUM_OF_FEATURES);
-	scanf("%d", &numberOfFeatures);
-	if (numberOfFeatures < MIN_NUM_OF_FEATURES) {
+	if (scanf("%d", &numberOfFeatures) == NULL
+			|| numberOfFeatures < MIN_NUM_OF_FEATURES) {
 		printf(ERROR_NUM_OF_FEATURES);
 		//-1 means the user input was not valid
-		numberOfFeatures = -1;
+		numberOfFeatures = ERROR;
 	}
 	return numberOfFeatures;
 }
@@ -90,35 +91,37 @@ int getHistogramsAndSiftDatabase(SPPoint**** RGBHistograms,
 		SPPoint**** SIFTDatabase, char* imagesPath, char* imagesSuffix,
 		char* imagesPrefix, int numOfImages, int numOfBins, int numOfFeatures,
 		int* featuresPerImage) {
+	char* fullImagePath;
+	char buffer[2];
 	*RGBHistograms = (SPPoint***) malloc(numOfImages * sizeof(SPPoint**));
 	featuresPerImage = (int*) malloc(numOfImages * sizeof(int));
 	if (featuresPerImage == NULL) {
 		printf(ERROR_ALLOCAT);
-		return 0;
+		return ERROR;
 	}
 	if (*RGBHistograms == NULL) {
 		printf(ERROR_ALLOCAT);
 		free(featuresPerImage);
-		return 0;
+		return ERROR;
 	}
 	*SIFTDatabase = (SPPoint***) malloc(numOfImages * sizeof(SPPoint**));
 	if (*SIFTDatabase == NULL) {
 		printf(ERROR_ALLOCAT);
 		free(RGBHistograms);
-		return 0;
+		return ERROR;
 	}
-	char* fullImagePath = (char*) malloc(MAX_STRING * sizeof(char));
+	fullImagePath = (char*) malloc(MAX_STRING * sizeof(char));
 	if (fullImagePath == NULL) {
 		printf(ERROR_ALLOCAT);
 		free(*RGBHistograms);
 		free(*SIFTDatabase);
-		return 0;
+		return ERROR;
 	}
-	char buffer[2];
+
 	for (int i = 0; i < numOfImages; i++) {
 		strcpy(fullImagePath, imagesPath);
 		strcat(fullImagePath, imagesPrefix);
-		sprintf(buffer,"%d",i);
+		sprintf(buffer, "%d", i);
 		strcat(fullImagePath, buffer);
 		strcat(fullImagePath, imagesSuffix);
 
@@ -126,40 +129,47 @@ int getHistogramsAndSiftDatabase(SPPoint**** RGBHistograms,
 		if ((*RGBHistograms)[i] == NULL) {
 			destroyDatabases(*RGBHistograms, i - 1);
 			free(featuresPerImage);
-			return 0;
+			return ERROR;
 		}
-		(*SIFTDatabase)[i] = spGetSiftDescriptors(fullImagePath, i, numOfFeatures,
-				&featuresPerImage[i]);
+		(*SIFTDatabase)[i] = spGetSiftDescriptors(fullImagePath, i,
+				numOfFeatures, &featuresPerImage[i]);
 		if ((*SIFTDatabase)[i] == NULL) {
 			printf(ERROR_ALLOCAT);
 			destroyDatabases(*SIFTDatabase, i);
 			free(featuresPerImage);
-			return 0;
+			return ERROR;
 		}
 
 	}
 
-	return 1;
+	return SUCCESS;
 }
 //return 0 if error occured
 int searchUsingGlobalFeatures(SPPoint** RGBQuery, SPPoint***RGBHistograms,
 		int numOfImages) {
+	BPQueueElement* element;
+	SP_BPQUEUE_MSG message;
+	double result;
 	SPBPQueue* queue = spBPQueueCreate(MAX_GLOBAL_HIST_SIZE);
 	if (queue == NULL) {
 		printf(ERROR_ALLOCAT);
-		return 0;
+		return ERROR;
 	}
 	for (int i = 0; i < numOfImages; i++) {
-		double result = spRGBHistL2Distance(RGBQuery, RGBHistograms[i]);
-		//check if msg returned?
-		spBPQueueEnqueue(queue, i, result);
+		result = spRGBHistL2Distance(RGBQuery, RGBHistograms[i]);
+		message = spBPQueueEnqueue(queue, i, result);
+		if (message != SP_BPQUEUE_SUCCESS) {
+			spBPQueueDestroy(queue);
+			printf(ERROR_GENERAL);
+			return ERROR;
+		}
 	}
 	//allocate queue element to peek inside the queue
-	BPQueueElement* element = (BPQueueElement*) malloc(sizeof(BPQueueElement));
+	element = (BPQueueElement*) malloc(sizeof(BPQueueElement));
 	if (element == NULL) {
 		printf(ERROR_ALLOCAT);
-		spBPQueueDestroy(queue);
-		return -1;
+		message = spBPQueueDestroy(queue);
+		return ERROR;
 	}
 	printf(MSG_NEAREST_IMGS_GLOBAL);
 	for (int i = 0; i < MAX_GLOBAL_HIST_SIZE; i++) {
@@ -168,26 +178,32 @@ int searchUsingGlobalFeatures(SPPoint** RGBQuery, SPPoint***RGBHistograms,
 			spBPQueueDestroy(queue);
 			free(element);
 			printf("\n");
-			return 1;
+			return ERROR;
 		}
 		if (i != 0)
 			printf(",");
-		spBPQueuePeek(queue, element);
-		spBPQueueDequeue(queue);
+		message = spBPQueuePeek(queue, element);
+		message = spBPQueueDequeue(queue);
+		if (message != SP_BPQUEUE_SUCCESS) {
+			spBPQueueDestroy(queue);
+			free(element);
+			printf("\n");
+			return ERROR;
+		}
 		printf("%d", element->index);
 	}
 	//free allocated memory
 	printf("\n");
 	spBPQueueDestroy(queue);
 	free(element);
-	return 1;
+	return SUCCESS;
 }
 int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
 		int nFeatures, int numOfImages, int* featuresPerImage) {
 	int* imagesHitCounter = (int*) malloc(numOfImages * sizeof(int));
 	if (imagesHitCounter == NULL) {
 		printf(ERROR_ALLOCAT);
-		return -1;
+		return ERROR;
 	}
 	//initialize imagesHitCounter array
 	for (int i = 0; i < numOfImages; i++)
@@ -198,7 +214,7 @@ int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
 				SIFTDatabase, numOfImages, featuresPerImage);
 		if (results == NULL) {
 			free(imagesHitCounter);
-			return -1;
+			return ERROR;
 		}
 		for (int j = 0; j < MAX_LOCAL_HIST_SIZE; j++) {
 			//in case we got less than MAX_LOCAL_HIST_SIZE

@@ -14,7 +14,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "sp_image_proc_util.h"
-extern "C"{
+extern "C" {
 #include "SPBPriorityQueue.h"
 }
 
@@ -49,6 +49,8 @@ extern "C"{
 #define POINTS_ARR_SIZE 3
 #define MAX_GLOBAL_HIST_SIZE 5
 #define MAX_LOCAL_HIST_SIZE 5
+#define ERROR -1
+#define SUCCESS 1
 
 //functions
 void getImagesPath(char** imagePathInput);
@@ -63,7 +65,7 @@ void destroyInputs(char* imagesPath, char* imagesPrefix, char* imagesSuffix);
 int searchUsingGlobalFeatures(SPPoint** RGBQuery, SPPoint***RGBHistograms,
 		int numOfImages);
 int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
-		int nFeatures, int numOfImages,int* featuresPerImage);
+		int nFeatures, int numOfImages, int* featuresPerImage);
 char* queryOrTerminate();
 void validateCharAllocation(char** validationArray, int size);
 void destroy(SPPoint*** RGB, SPPoint*** SIFT, char* imagesPath,
@@ -82,5 +84,6 @@ int comperator(const void * a, const void * b);
 
 int getHistogramsAndSiftDatabase(SPPoint**** RGBHistograms,
 		SPPoint**** SIFTDatabase, char* imagesPath, char* imagesSuffix,
-		char* imagesPrefix, int numOfImages, int numOfBins, int numOfFeatures,int* featuresPerImage);
+		char* imagesPrefix, int numOfImages, int numOfBins, int numOfFeatures,
+		int* featuresPerImage);
 #endif /* MAIN_AUX_H_ */

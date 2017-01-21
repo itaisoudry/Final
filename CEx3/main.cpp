@@ -42,7 +42,7 @@ int main1() {
 	int result = getHistogramsAndSiftDatabase(&RGBHistograms, &SIFTDatabase,
 			imagesPath, imagesSuffix, imagesPrefix, numOfImages, numOfBins,
 			numOfFeatures, featuresPerImage);
-	if (result == 0) {
+	if (result == ERROR) {
 		destroyInputs(imagesSuffix, imagesPrefix, imagesPath);
 		return 0;
 	}
@@ -50,7 +50,7 @@ int main1() {
 	if (query == NULL) {
 		destroy(RGBHistograms, SIFTDatabase, imagesSuffix, imagesPrefix,
 				imagesPath, validationArray, numOfImages);
-		return 0;
+		return ERROR;
 	}
 	//as long as the user didn't terminate the program
 	while (query[0] != '#') {
@@ -65,17 +65,17 @@ int main1() {
 			free(query);
 			if (RGBQuery != NULL)
 				destroyHistOrSIFT(RGBQuery);
-			return 0;
+			return ERROR;
 		}
 		int result = searchUsingGlobalFeatures(RGBQuery, RGBHistograms,
 				numOfImages);
-		//result = -1 means error occurred inside the function
-		if (result == -1) {
+		//error occurred inside the function
+		if (result == ERROR) {
 			destroy(RGBHistograms, SIFTDatabase, imagesSuffix, imagesPrefix,
 					imagesPath, validationArray, numOfImages);
 			free(query);
 			destroyHistOrSIFT(RGBQuery);
-			return 0;
+			return ERROR;
 		}
 		result = searchUsingLocalFeatures(SIFTQuery, SIFTDatabase, nFeatures,
 				numOfImages, featuresPerImage);
@@ -85,6 +85,6 @@ int main1() {
 	destroy(RGBHistograms, SIFTDatabase, imagesSuffix, imagesPrefix, imagesPath,
 			validationArray, numOfImages);
 	free(query);
-	return 0;
+	return SUCCESS;
 }
 
