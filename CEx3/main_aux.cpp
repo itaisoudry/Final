@@ -224,6 +224,13 @@ int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
 	printf(MSG_NEAREST_IMGS_LOCAL);
 	int maxIndex;
 	int maxCount;
+	///DEBUG
+//	for(int i=0;i<numOfImages;i++){
+//		printf("%d , ",imagesHitCounter[i]);
+//
+//	}
+
+	///
 	for (int i = 0; i < MAX_LOCAL_HIST_SIZE && i < numOfImages; i++) {
 		maxIndex = -1;
 		maxCount = 0;
@@ -239,6 +246,7 @@ int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
 		imagesHitCounter[maxIndex] = -1;
 	}
 	printf("\n");
+
 	free(results);
 	free(imagesHitCounter);
 	//quick sort in descending order using comperator

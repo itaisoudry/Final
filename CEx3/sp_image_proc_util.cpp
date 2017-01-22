@@ -170,6 +170,7 @@ int* spBestSIFTL2SquaredDistance(int kClosest, SPPoint* queryFeature,
 		for (int j = 0; j < nFeaturesPerImage[i]; j++) {
 			double L2Distance = spPointL2SquaredDistance(databaseFeatures[i][j],
 					queryFeature);
+			//TODO - check msg
 			spBPQueueEnqueue(kClosestQueue,
 					spPointGetIndex(databaseFeatures[i][j]), L2Distance);
 		}

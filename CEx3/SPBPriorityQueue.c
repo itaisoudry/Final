@@ -125,7 +125,8 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue* source, int index, double value) {
 			return SP_BPQUEUE_FULL;
 		}
 		if (value == (source->queue[size - 1]).value) {
-			(source->queue[size - 1]) = *newElement;
+			if (index < (source->queue[size - 1]).index)
+				(source->queue[size - 1]) = *newElement;
 			return SP_BPQUEUE_SUCCESS;
 		}
 		swapIndex--;
@@ -133,7 +134,11 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue* source, int index, double value) {
 //while bigger value not found and not finished iterating over array
 	while ((i % maxSize) < size && !found) {
 		//if bigger value found
-		if ((source->queue[i]).value > value) {
+		if ((source->queue[i]).value > value
+				|| ((source->queue[i]).index > index
+						&& (source->queue[i]).value == value)) {
+			if((source->queue[i]).value == value)
+				printf("equal value");
 			//shift array to the right by one
 			while (swapIndex >= i) {
 				source->queue[swapIndex + 1].index =
@@ -146,6 +151,7 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue* source, int index, double value) {
 			//break loop
 			found = true;
 		}
+
 		i = (i + 1) % maxSize;
 	}
 	if (!found) {
