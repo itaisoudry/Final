@@ -217,9 +217,11 @@ int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
 		for (int j = 0; j < MAX_LOCAL_HIST_SIZE; j++) {
 			//in case we got less than MAX_LOCAL_HIST_SIZE
 			if (&results[j] != NULL) {
+				printf("%d , ",results[j]);
 				imagesHitCounter[results[j]]++;
 			}
 		}
+		printf("\n");
 	}
 	printf(MSG_NEAREST_IMGS_LOCAL);
 	int maxIndex;

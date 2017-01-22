@@ -153,6 +153,7 @@ SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
 int* spBestSIFTL2SquaredDistance(int kClosest, SPPoint* queryFeature,
 		SPPoint*** databaseFeatures, int numberOfImages,
 		int* nFeaturesPerImage) {
+	SP_BPQUEUE_MSG message;
 	SPBPQueue* kClosestQueue;
 	if (queryFeature == NULL || databaseFeatures == NULL
 			|| nFeaturesPerImage == NULL || numberOfImages <= 1) {
@@ -170,9 +171,13 @@ int* spBestSIFTL2SquaredDistance(int kClosest, SPPoint* queryFeature,
 		for (int j = 0; j < nFeaturesPerImage[i]; j++) {
 			double L2Distance = spPointL2SquaredDistance(databaseFeatures[i][j],
 					queryFeature);
-			//TODO - check msg
-			spBPQueueEnqueue(kClosestQueue,
+			//check msg
+			message=spBPQueueEnqueue(kClosestQueue,
 					spPointGetIndex(databaseFeatures[i][j]), L2Distance);
+			if(message!=SP_BPQUEUE_SUCCESS && message!=SP_BPQUEUE_FULL){
+				spBPQueueDestroy(kClosestQueue);
+				return NULL;
+			}
 		}
 	}
 	BPQueueElement* result = (BPQueueElement*) malloc(sizeof(BPQueueElement));
