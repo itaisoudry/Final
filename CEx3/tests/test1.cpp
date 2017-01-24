@@ -9,13 +9,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define IMG0 "/home/soudry/git/CAssignment3/CEx3/images/img0.png"
-#define IMG1 "/home/soudry/git/CAssignment3/CEx3/images/img1.png"
-#define IMG2 "/home/soudry/git/CAssignment3/CEx3/images/img2.png"
-#define IMG3 "/home/soudry/git/CAssignment3/CEx3/images/img3.png"
-#define QUERYA "/home/soudry/git/CAssignment3/CEx3/queryA.png"
-#define QUERYB "/home/soudry/git/CAssignment3/CEx3/queryB.png"
-#define QUERYC "/home/soudry/git/CAssignment3/CEx3/queryC.png"
+#define IMG0 "/home/ifat/git/CAssignment3/CEx3/images/img0.png"
+#define IMG1 "/home/ifat/git/CAssignment3/CEx3/images/img1.png"
+#define IMG2 "/home/ifat/git/CAssignment3/CEx3/images/img2.png"
+#define IMG3 "/home/ifat/git/CAssignment3/CEx3/images/img3.png"
+#define QUERYA "/home/ifat/git/CAssignment3/CEx3/queryA.png"
+#define QUERYB "/home/ifat/git/CAssignment3/CEx3/queryB.png"
+#define QUERYC "/home/ifat/git/CAssignment3/CEx3/queryC.png"
 void spGetSiftDescriptorsTest() {
 	int* num = (int*) malloc(sizeof(int));
 	*num = 0;
@@ -49,7 +49,7 @@ void example1(char* queryPath) {
 	int numOfBins = 16;
 	int numOfFeatures = 100;
 
-	char imagesPath[] = "/home/soudry/git/CAssignment3/CEx3/images/";
+	char imagesPath[] = "/home/ifat/git/CAssignment3/CEx3/images/";
 	char imagesSuffix[] = ".png";
 	char imagesPrefix[] = "img";
 	SPPoint*** RGBHistograms = (SPPoint***) malloc(
@@ -90,12 +90,15 @@ void example1(char* queryPath) {
 		printf("SUCCESS");
 
 }
-int main() {
+int main1() {
 //	spGetSiftDescriptorsTest();
 //	spBestSIFTL2SquaredDistanceTest();
-	char queryA[] = "/home/soudry/git/CAssignment3/CEx3/queryA.png";
-	char queryB[] = "/home/soudry/git/CAssignment3/CEx3/queryB.png";
-	char queryC[] = "/home/soudry/git/CAssignment3/CEx3/queryC.png";
+	/**
+	 * Change the path to the images here and at the top of this file
+	 */
+	char queryA[] = "/home/ifat/git/CAssignment3/CEx3/queryA.png";
+	char queryB[] = "/home/ifat/git/CAssignment3/CEx3/queryB.png";
+	char queryC[] = "/home/ifat/git/CAssignment3/CEx3/queryC.png";
 	example1(queryA);
 	printf("\n\n");
 	example1(queryB);
