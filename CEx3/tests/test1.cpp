@@ -6,11 +6,16 @@
  */
 #include "../sp_image_proc_util.h"
 #include "../main_aux.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #define IMG0 "/home/soudry/git/CAssignment3/CEx3/images/img0.png"
 #define IMG1 "/home/soudry/git/CAssignment3/CEx3/images/img1.png"
 #define IMG2 "/home/soudry/git/CAssignment3/CEx3/images/img2.png"
 #define IMG3 "/home/soudry/git/CAssignment3/CEx3/images/img3.png"
-
+#define QUERYA "/home/soudry/git/CAssignment3/CEx3/queryA.png"
+#define QUERYB "/home/soudry/git/CAssignment3/CEx3/queryB.png"
+#define QUERYC "/home/soudry/git/CAssignment3/CEx3/queryC.png"
 void spGetSiftDescriptorsTest() {
 	int* num = (int*) malloc(sizeof(int));
 	*num = 0;
@@ -39,7 +44,73 @@ void spBestSIFTL2SquaredDistanceTest() {
 	else
 		printf("FAILED\n");
 }
-int main() {
-	spGetSiftDescriptorsTest();
-	spBestSIFTL2SquaredDistanceTest();
+void example1(char* queryPath) {
+	int numOfImages = 17;
+	int numOfBins = 16;
+	int numOfFeatures = 100;
+
+	char imagesPath[] = "/home/soudry/git/CAssignment3/CEx3/images/";
+	char imagesSuffix[] = ".png";
+	char imagesPrefix[] = "img";
+	SPPoint*** RGBHistograms = (SPPoint***) malloc(
+			numOfImages * sizeof(SPPoint**));
+	SPPoint*** SIFTDatabase = (SPPoint***) malloc(
+			numOfImages * sizeof(SPPoint**));
+	;
+
+	int* featuresPerImage = getHistogramsAndSiftDatabase(&RGBHistograms,
+			&SIFTDatabase, imagesPath, imagesSuffix, imagesPrefix, numOfImages,
+			numOfBins, numOfFeatures);
+	if (featuresPerImage != NULL)
+		printf("SUCCESS\n");
+	else {
+		printf("FAILED");
+		return;
+	}
+
+	int nFeatures = -1;
+	SPPoint** RGBQuery = spGetRGBHist(queryPath, 0, numOfBins);
+	SPPoint** SIFTQuery = spGetSiftDescriptors(queryPath, 0, numOfFeatures,
+			&nFeatures);
+	if (RGBQuery == NULL || SIFTQuery == NULL) {
+		printf("FAILED");
+		return;
+	}
+	int result = searchUsingGlobalFeatures(RGBQuery, RGBHistograms,
+			numOfImages);
+	if (result == ERROR) {
+		printf("FAILED");
+		return;
+	}
+	result = searchUsingLocalFeatures(SIFTQuery, SIFTDatabase, nFeatures,
+			numOfImages, featuresPerImage);
+	if (result == ERROR) {
+		printf("FAILED");
+	} else
+		printf("SUCCESS");
+
+}
+int main1() {
+//	spGetSiftDescriptorsTest();
+//	spBestSIFTL2SquaredDistanceTest();
+	char queryA[] = "/home/soudry/git/CAssignment3/CEx3/queryA.png";
+	char queryB[] = "/home/soudry/git/CAssignment3/CEx3/queryB.png";
+	char queryC[] = "/home/soudry/git/CAssignment3/CEx3/queryC.png";
+	example1(queryA);
+	printf("\n\n");
+	example1(queryB);
+	printf("\n\n");
+	example1(queryC);
+
+//	for (int i = 1; i < 3; i++) {
+//		char str[80]="";
+//		char imageIndex = i+'0';
+//		printf("%c\n",imageIndex);
+//		strcpy(str, "img");
+//		char buffer[2];
+//		sprintf(buffer, "%d", i);
+//		strcat(str,buffer);
+//		printf("%s\n",str);
+//}
+	return 0;
 }

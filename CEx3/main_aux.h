@@ -14,6 +14,9 @@
 #include <string.h>
 #include <ctype.h>
 #include "sp_image_proc_util.h"
+extern "C" {
+#include "SPBPriorityQueue.h"
+}
 
 //Input
 #define INPUT_IMG_DIRECTORY_PATH "Enter images directory path:\n"
@@ -44,14 +47,43 @@
 #define MIN_NUM_OF_FEATURES 1
 #define NORMALIZE_FACTOR 0.33
 #define POINTS_ARR_SIZE 3
+#define MAX_GLOBAL_HIST_SIZE 5
+#define MAX_LOCAL_HIST_SIZE 5
+#define ERROR -1
+#define SUCCESS 1
 
 //functions
-void getImagesPath(char *imagePathInput);
-void getImagesPrefix(char *imagesPrefix);
+void getImagesPath(char** imagePathInput);
+void getImagesPrefix(char** imagesPrefix);
+void getImagesSuffix(char** imagesSuffixInput);
 int getNumberOfImages();
-void getImagesSuffix(char* imagesSuffixInput);
 int getNumberOfBins();
 int getNumberOfFeatures();
 void validateCharAllocation(char** validationArray, int size);
-int getImageIndex(char* imagePrefix);
+void destroyDatabases(SPPoint*** arrayToDestroy, int size);
+void destroyInputs(char* imagesPath, char* imagesPrefix, char* imagesSuffix);
+int searchUsingGlobalFeatures(SPPoint** RGBQuery, SPPoint***RGBHistograms,
+		int numOfImages);
+int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
+		int nFeatures, int numOfImages, int* featuresPerImage);
+char* queryOrTerminate(char* imagesPath);
+void validateCharAllocation(char** validationArray, int size);
+void destroy(SPPoint*** RGB, SPPoint*** SIFT, char* imagesPath,
+		char*imagesPrefix, char*imagesSuffix, char** validationArray,
+		int numOfImages);
+void destroyDatabases(SPPoint*** arrayToDestroy, int size);
+void destroyInputs(char* imagesPath, char* imagesPrefix, char* imagesSuffix);
+void destroyValidationArrayBySize(char** validationArray, int size);
+void destroyHistOrSIFT(SPPoint** toDestroy);
+void destroyValidationArray(char** validationArray);
+int comperator(const void * a, const void * b);
+
+/**
+ * creates sift and histograms databases
+ * @return NULL if error occurred featuresPerImage otherwise
+ */
+
+int* getHistogramsAndSiftDatabase(SPPoint**** RGBHistograms,
+		SPPoint**** SIFTDatabase, char* imagesPath, char* imagesSuffix,
+		char* imagesPrefix, int numOfImages, int numOfBins, int numOfFeatures);
 #endif /* MAIN_AUX_H_ */
