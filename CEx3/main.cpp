@@ -32,13 +32,24 @@ int main() {
 	validateCharAllocation(validationArray, 2);
 
 	numOfImages = getNumberOfImages();
+	if (numOfImages == ERROR) {
+		destroyValidationArrayBySize(validationArray, 2);
+		exit(-1);
+	}
 	getImagesSuffix(&imagesSuffix);
 	validationArray[2] = imagesSuffix;
 	validateCharAllocation(validationArray, 3);
 
 	numOfBins = getNumberOfBins();
+	if (numOfBins == ERROR) {
+		destroyValidationArray(validationArray);
+		exit(-1);
+	}
 	numOfFeatures = getNumberOfFeatures();
-
+	if (numOfFeatures == ERROR) {
+			destroyValidationArray(validationArray);
+			exit(-1);
+		}
 	featuresPerImage = getHistogramsAndSiftDatabase(&RGBHistograms,
 			&SIFTDatabase, imagesPath, imagesSuffix, imagesPrefix, numOfImages,
 			numOfBins, numOfFeatures);
@@ -46,7 +57,7 @@ int main() {
 		destroyInputs(imagesSuffix, imagesPrefix, imagesPath);
 		return 0;
 	}
-	char* query = queryOrTerminate();
+	char* query = queryOrTerminate(imagesPath);
 	if (query == NULL) {
 		destroy(RGBHistograms, SIFTDatabase, imagesSuffix, imagesPrefix,
 				imagesPath, validationArray, numOfImages);
@@ -59,12 +70,12 @@ int main() {
 		SPPoint** SIFTQuery = spGetSiftDescriptors(query, -1, numOfFeatures,
 				&nFeatures);
 		if (RGBQuery == NULL || SIFTQuery == NULL) {
-			printf(ERROR_ALLOCAT);
 			destroy(RGBHistograms, SIFTDatabase, imagesSuffix, imagesPrefix,
 					imagesPath, validationArray, numOfImages);
 			free(query);
 			if (RGBQuery != NULL)
 				destroyHistOrSIFT(RGBQuery);
+			destroyValidationArray(validationArray);
 			return ERROR;
 		}
 		int result = searchUsingGlobalFeatures(RGBQuery, RGBHistograms,
@@ -75,6 +86,7 @@ int main() {
 					imagesPath, validationArray, numOfImages);
 			free(query);
 			destroyHistOrSIFT(RGBQuery);
+			destroyValidationArray(validationArray);
 			return ERROR;
 		}
 		result = searchUsingLocalFeatures(SIFTQuery, SIFTDatabase, nFeatures,
@@ -85,6 +97,7 @@ int main() {
 	destroy(RGBHistograms, SIFTDatabase, imagesSuffix, imagesPrefix, imagesPath,
 			validationArray, numOfImages);
 	free(query);
+	destroyValidationArray(validationArray);
 	return SUCCESS;
 }
 

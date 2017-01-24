@@ -115,4 +115,5 @@ int main1() {
 //		strcat(str,buffer);
 //		printf("%s\n",str);
 //}
+	return 0;
 }
