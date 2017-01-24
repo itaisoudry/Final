@@ -84,6 +84,7 @@ int getNumberOfFeatures() {
 		//-1 means the user input was not valid
 		numberOfFeatures = ERROR;
 	}
+	getchar();
 	return numberOfFeatures;
 }
 
@@ -156,7 +157,7 @@ int searchUsingGlobalFeatures(SPPoint** RGBQuery, SPPoint***RGBHistograms,
 	for (int i = 0; i < numOfImages; i++) {
 		result = spRGBHistL2Distance(RGBQuery, RGBHistograms[i]);
 		message = spBPQueueEnqueue(queue, i, result);
-		if (message != SP_BPQUEUE_SUCCESS && message!=SP_BPQUEUE_FULL) {
+		if (message != SP_BPQUEUE_SUCCESS && message != SP_BPQUEUE_FULL) {
 			spBPQueueDestroy(queue);
 			printf(ERROR_GENERAL);
 			return ERROR;
@@ -217,22 +218,13 @@ int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
 		for (int j = 0; j < MAX_LOCAL_HIST_SIZE; j++) {
 			//in case we got less than MAX_LOCAL_HIST_SIZE
 			if (&results[j] != NULL) {
-				//printf("%d , ",results[j]);
 				imagesHitCounter[results[j]]++;
 			}
 		}
-		//printf("\n");
 	}
 	printf(MSG_NEAREST_IMGS_LOCAL);
 	int maxIndex;
 	int maxCount;
-	///DEBUG
-	for(int i=0;i<numOfImages;i++){
-		printf("%d , ",imagesHitCounter[i]);
-
-	}
-
-	///
 	for (int i = 0; i < MAX_LOCAL_HIST_SIZE && i < numOfImages; i++) {
 		maxIndex = -1;
 		maxCount = 0;
@@ -252,31 +244,15 @@ int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
 	free(results);
 	free(imagesHitCounter);
 	return SUCCESS;
-	//quick sort in descending order using comperator
-//	qsort(imagesHitCounter, numOfImages, sizeof(int), comperator);
-//	printf(MSG_NEAREST_IMGS_LOCAL);
-//	for (int i = 0; i < MAX_LOCAL_HIST_SIZE && i < numOfImages; i++) {
-//		if (i != 0)
-//			printf(",");
-//		printf("%d", imagesHitCounter[i]);
-//	}
-//
-//	if (results != NULL)
-//		free(results);
-//	free(imagesHitCounter);
 
 }
-int comperator(const void * a, const void * b) {
-	return (*(int*) b - *(int*) a);
-}
-char* queryOrTerminate() {
+char* queryOrTerminate(char* imagesPath) {
 	printf(INPUT_QUERY_OR_TERMINATE);
 	char* input = (char*) malloc(MAX_STRING * sizeof(char));
 	if (input == NULL) {
 		printf(ERROR_ALLOCAT);
 		return NULL;
 	}
-	printf(INPUT_IMG_SUFFIX);
 	if (fgets(input, MAX_STRING, stdin) == NULL) {
 		free(input);
 		printf(ERROR_GENERAL);
@@ -286,7 +262,17 @@ char* queryOrTerminate() {
 		printf(MSG_EXITING);
 		return NULL;
 	}
-	return input;
+	char* newPath = (char*)malloc(MAX_STRING * sizeof(char));
+	if(newPath==NULL){
+		printf(ERROR_ALLOCAT);
+		free(input);
+		return NULL;
+	}
+	strcpy(newPath, imagesPath);
+	strtok(newPath, "images/");
+	strcat(newPath, "/");
+	strcat(newPath, input);
+	return newPath;
 }
 void validateCharAllocation(char** validationArray, int size) {
 	int index = 0;
@@ -298,9 +284,15 @@ void validateCharAllocation(char** validationArray, int size) {
 		index++;
 	}
 	if (found) {
-		destroyValidationArray(validationArray, size);
+		destroyValidationArrayBySize(validationArray, size);
+		exit(-1);
 	}
 
+}
+void destroyValidationArray(char** validationArray) {
+	for (int i = 0; i < CHAR_ALLOCATION_IN_MAIN; i++)
+		free(validationArray[i]);
+	free(validationArray);
 }
 void destroy(SPPoint*** RGB, SPPoint*** SIFT, char* imagesPath,
 		char*imagesPrefix, char*imagesSuffix, char** validationArray,
@@ -308,7 +300,7 @@ void destroy(SPPoint*** RGB, SPPoint*** SIFT, char* imagesPath,
 	destroyDatabases(RGB, numOfImages);
 	destroyDatabases(SIFT, numOfImages);
 	destroyInputs(imagesSuffix, imagesPrefix, imagesPath);
-	destroyValidationArray(validationArray, 3);
+	destroyValidationArrayBySize(validationArray, 3);
 }
 void destroyDatabases(SPPoint*** arrayToDestroy, int size) {
 	for (int i = 0; i < size; i++) {
@@ -333,7 +325,7 @@ void destroyInputs(char* imagesPath, char* imagesPrefix, char* imagesSuffix) {
 	free(imagesSuffix);
 	free(imagesPrefix);
 }
-void destroyValidationArray(char** validationArray, int size) {
+void destroyValidationArrayBySize(char** validationArray, int size) {
 	int index;
 	//if size==1 noting were allocated...
 	for (index = 0; index < size; index++) {

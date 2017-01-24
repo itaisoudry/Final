@@ -90,7 +90,7 @@ void example1(char* queryPath) {
 		printf("SUCCESS");
 
 }
-int main() {
+int main1() {
 //	spGetSiftDescriptorsTest();
 //	spBestSIFTL2SquaredDistanceTest();
 	char queryA[] = "/home/soudry/git/CAssignment3/CEx3/queryA.png";
@@ -112,4 +112,5 @@ int main() {
 //		strcat(str,buffer);
 //		printf("%s\n",str);
 //}
+	return 0;
 }
