@@ -57,7 +57,7 @@ int main() {
 		destroyInputs(imagesSuffix, imagesPrefix, imagesPath);
 		return 0;
 	}
-	char* query = queryOrTerminate(imagesPath);
+	char* query = queryOrTerminate();
 	if (query == NULL) {
 		destroy(RGBHistograms, SIFTDatabase, imagesSuffix, imagesPrefix,
 				imagesPath, validationArray, numOfImages);
@@ -66,8 +66,8 @@ int main() {
 	//as long as the user didn't terminate the program
 	while (query[0] != '#') {
 		int nFeatures;
-		SPPoint** RGBQuery = spGetRGBHist(query, -1, numOfBins);
-		SPPoint** SIFTQuery = spGetSiftDescriptors(query, -1, numOfFeatures,
+		SPPoint** RGBQuery = spGetRGBHist(query, 0, numOfBins);
+		SPPoint** SIFTQuery = spGetSiftDescriptors(query, 0, numOfFeatures,
 				&nFeatures);
 		if (RGBQuery == NULL || SIFTQuery == NULL) {
 			destroy(RGBHistograms, SIFTDatabase, imagesSuffix, imagesPrefix,
@@ -93,6 +93,7 @@ int main() {
 				numOfImages, featuresPerImage);
 		destroyHistOrSIFT(RGBQuery);
 		destroyHistOrSIFT(SIFTQuery);
+		query = queryOrTerminate();
 	}
 	destroy(RGBHistograms, SIFTDatabase, imagesSuffix, imagesPrefix, imagesPath,
 			validationArray, numOfImages);

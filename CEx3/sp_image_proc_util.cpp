@@ -25,9 +25,13 @@
 using namespace cv;
 SPPoint** spGetRGBHist(const char* str, int imageIndex, int nBins) {
 	cv::Mat src;
-	SPPoint** result = (SPPoint**) malloc(HIST_NUM * sizeof(SPPoint*));
 	if (str == NULL || nBins <= 0) {
 		printf(ERROR_GENERAL);
+		return NULL;
+	}
+	SPPoint** result = (SPPoint**) malloc(HIST_NUM * sizeof(SPPoint*));
+	if(result==NULL){
+		printf(ERROR_ALLOCAT);
 		return NULL;
 	}
 	src = cv::imread(str, CV_LOAD_IMAGE_COLOR);

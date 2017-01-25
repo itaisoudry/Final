@@ -66,7 +66,7 @@ int searchUsingGlobalFeatures(SPPoint** RGBQuery, SPPoint***RGBHistograms,
 		int numOfImages);
 int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
 		int nFeatures, int numOfImages, int* featuresPerImage);
-char* queryOrTerminate(char* imagesPath);
+char* queryOrTerminate();
 void validateCharAllocation(char** validationArray, int size);
 void destroy(SPPoint*** RGB, SPPoint*** SIFT, char* imagesPath,
 		char*imagesPrefix, char*imagesSuffix, char** validationArray,

@@ -246,7 +246,7 @@ int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
 	return SUCCESS;
 
 }
-char* queryOrTerminate(char* imagesPath) {
+char* queryOrTerminate() {
 	printf(INPUT_QUERY_OR_TERMINATE);
 	char* input = (char*) malloc(MAX_STRING * sizeof(char));
 	if (input == NULL) {
@@ -262,15 +262,15 @@ char* queryOrTerminate(char* imagesPath) {
 		printf(MSG_EXITING);
 		return NULL;
 	}
-	char* newPath = (char*)malloc(MAX_STRING * sizeof(char));
-	if(newPath==NULL){
+	char* newPath = (char*) malloc(MAX_STRING * sizeof(char));
+	if (newPath == NULL) {
 		printf(ERROR_ALLOCAT);
-		free(input);
 		return NULL;
 	}
-	strncpy(newPath,imagesPath,strlen(imagesPath)-strlen("images/"));
-	strcat(newPath,input);
-	printf("%s",newPath);
+	strcpy(newPath, "./");
+	strcat(newPath, input);
+	strtok(newPath,"\n");
+	free(input);
 	return newPath;
 }
 void validateCharAllocation(char** validationArray, int size) {
