@@ -260,19 +260,34 @@ char* queryOrTerminate(char* imagesPath) {
 	}
 	if (input[0] == '#') {
 		printf(MSG_EXITING);
-		return NULL;
-	}
-	char* newPath = (char*)malloc(MAX_STRING * sizeof(char));
-	if(newPath==NULL){
-		printf(ERROR_ALLOCAT);
 		free(input);
 		return NULL;
 	}
-	strcpy(newPath, imagesPath);
-	strtok(newPath, "images/");
-	strcat(newPath, "/");
-	strcat(newPath, input);
-	return newPath;
+	char newstr[200];//TODO change to max_string
+	char* A;
+	char* B;
+
+	strncpy(newstr,imagesPath,strlen(imagesPath));
+	A=strstr(newstr,"images/");
+	B=strstr(input,"\n");
+	strncpy(B,"",2);
+	strcpy(A,input);
+	input =newstr;
+	return input;
+
+//	char* newPath = (char*)malloc(MAX_STRING * sizeof(char));
+//	if(newPath==NULL){
+//		printf(ERROR_ALLOCAT);
+	//	free(input);
+//		return NULL;
+	//}
+	//strcpy(newPath,"");
+	//strcpy(newPath,imagesPath);
+	//strtok(newPath,"images/");
+
+
+
+
 }
 void validateCharAllocation(char** validationArray, int size) {
 	int index = 0;
