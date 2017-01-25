@@ -268,10 +268,9 @@ char* queryOrTerminate(char* imagesPath) {
 		free(input);
 		return NULL;
 	}
-	strcpy(newPath, imagesPath);
-	strtok(newPath, "images/");
-	strcat(newPath, "/");
-	strcat(newPath, input);
+	strncpy(newPath,imagesPath,strlen(imagesPath)-strlen("images/"));
+	strcat(newPath,input);
+	printf("%s",newPath);
 	return newPath;
 }
 void validateCharAllocation(char** validationArray, int size) {
