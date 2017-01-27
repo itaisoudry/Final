@@ -93,6 +93,7 @@ int main() {
 				numOfImages, featuresPerImage);
 		destroyHistOrSIFT(RGBQuery);
 		destroyHistOrSIFT(SIFTQuery);
+		free(query);
 		query = queryOrTerminate();
 	}
 	destroy(RGBHistograms, SIFTDatabase, imagesSuffix, imagesPrefix, imagesPath,
