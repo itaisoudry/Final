@@ -53,34 +53,155 @@ extern "C" {
 #define SUCCESS 1
 
 //functions
+
+/*
+ * getImagesPath
+ * gets  Images path from the user, and saves it to imagePathInput.
+ * @param imagePathInput - The pointer to the path of the images that the user will insert
+ * @return NULL if allocation went wrong or if user didn't insert a path.
+ */
 void getImagesPath(char** imagePathInput);
+/*
+ * getImagesPrefix
+ * gets  Images prefix from the user, and saves it to imagesPrefix.
+ * @param imagesPrefix - The pointer to the images prefix that the user will insert
+ * @return NULL if allocation went wrong or if user didn't insert a path.
+ */
 void getImagesPrefix(char** imagesPrefix);
+/*
+ * getImagesSuffix
+ * gets  Images suffix  from the user, and saves it to imagesSuffixInput.
+ * @param imagesSuffixInput - The pointer to the path of the images suffix that the user will insert
+ * @return NULL if allocation went wrong or if user didn't insert a path.
+ */
 void getImagesSuffix(char** imagesSuffixInput);
+/*
+ * getNumberOfImages
+ * gets  the number of images from the user, and returns it.
+ * @return ERROR if user input is not valid else return number of images.
+ */
 int getNumberOfImages();
+/*
+ * getNumberOfBins
+ * gets  the number of Bins from the user, and returns it.
+ * @return ERROR if user input is not valid else return number of Bins.
+ */
 int getNumberOfBins();
+/*
+ * getNumberOfFeatures
+ * gets  the number of features from the user, and returns it.
+ * @return ERROR if user input is not valid else return number of features.
+ */
 int getNumberOfFeatures();
+/*
+ * validateCharAllocation
+ *checks if all allocations of the array succeeded . if they don't, it destroys all allocations before it and exit the program
+ *@param validationArray - array to be validated.
+ *@param the size of the array.
+ */
 void validateCharAllocation(char** validationArray, int size);
+/*
+ * destroyDatabases
+ * destroys all database, free all memory
+ *@param arrayToDestroy - array of database to be destroyed.
+ *@param the size of the array.
+ */
 void destroyDatabases(SPPoint*** arrayToDestroy, int size);
+/*
+ * destroyInputs
+ * destroys all user's inputs, free all memory
+ *@param imagesPath - the path that the user inserted to be destroyed.
+ *@param imagesPrefix -the images prefix that the user inserted to be destroyed
+ *@param imagesSuffix -the images suffix that the user inserted to be destroyed
+ */
 void destroyInputs(char* imagesPath, char* imagesPrefix, char* imagesSuffix);
+/*
+ * searchUsingGlobalFeatures
+ * computes for each RGB histogram of the images in the database the L2-Squared distans between the query image and the histograms.
+ * show the best 5 image indexes.
+ * @param RGBQuery - query histogram
+ * @param RGBHistograms histograms of all images
+ * @param numOfImages the number of images
+ * @return 0 if error occurred. else prints the closest 5 images and return SUCCESS
+ *
+ */
 int searchUsingGlobalFeatures(SPPoint** RGBQuery, SPPoint***RGBHistograms,
 		int numOfImages);
+/*
+ * searchUsingLocalFeatures
+ * computes for each sift features of the images in the database the spBestSIFTL2SquaredDistance between the query image and the images.
+ * show the best 5 image indexes (closest ones).
+ * @param query - query path
+ * @param SIFTDatabase database of all sift features of all images
+ * @param nFeatures the number of features
+ * @param numOfImages - the number of images
+ * @param featuresPerImage - the number of features for image
+ *
+ * @return 0 if error occurred. else prints the closest 5 images and return SUCCESS
+ *
+ */
 int searchUsingLocalFeatures(SPPoint** query, SPPoint*** SIFTDatabase,
 		int nFeatures, int numOfImages, int* featuresPerImage);
+/*
+ * queryOrTerminate
+ * gets  imagesPath and query image name from the user, and saves it to query.
+ * @param imagesPath - The path of the images
+ * @return NULL if allocation went wrong or if user didn't insert a path.
+ */
+
 char* queryOrTerminate(char* imagesPath);
-void validateCharAllocation(char** validationArray, int size);
+
+void validateCharAllocation(char** validationArray, int size);//TODO delete
+/* destroy
+ * uses all the destroy functions and destroys everything. exiting the program.
+ *@param RGB - RGB SPPoint*** to be destroyed.
+ *@param SIFT- SIFT SPPoint*** to be destroyed.
+ *@param imagesPath - the path to images folder to be destroyed.
+ *@param imagesPrefix the prefix of the images to be destroyed.
+ *@param imagesSuffix -the suffix of the images to be destroyed.
+ *@param validationArray array to be destroyed.
+ *@param numOfImages - the number of images.
+ */
+
 void destroy(SPPoint*** RGB, SPPoint*** SIFT, char* imagesPath,
 		char*imagesPrefix, char*imagesSuffix, char** validationArray,
 		int numOfImages);
-void destroyDatabases(SPPoint*** arrayToDestroy, int size);
-void destroyInputs(char* imagesPath, char* imagesPrefix, char* imagesSuffix);
+void destroyDatabases(SPPoint*** arrayToDestroy, int size);//TODO delete
+void destroyInputs(char* imagesPath, char* imagesPrefix, char* imagesSuffix);//TODO delete
+/*
+ * destroyValidationArrayBySize
+ * frees memory of all the allocations made for the contents of the array.
+ * @param validationArray -array to free
+ * @param size - the size of the array.
+ */
 void destroyValidationArrayBySize(char** validationArray, int size);
+/*
+ * destroyHistOrSIFT
+ * get a SPPoint** of histograms or sift, and frees all memory allocated for the contents of the point array
+ * @param toDestroy -SPPoint** of histograms or sift.
+ */
 void destroyHistOrSIFT(SPPoint** toDestroy);
+/*
+ * destroyValidationArray
+ * frees memory of all the allocations made for the contents of the array.
+ * @param validationArray -array to free
+ */
 void destroyValidationArray(char** validationArray);
+
 int comperator(const void * a, const void * b);
 
-/**
+/*
+ * getHistogramsAndSiftDatabase
  * creates sift and histograms databases
- * @return NULL if error occurred featuresPerImage otherwise
+ * @param RGBHistograms - the histograms to be inserted to the database
+ * @param SIFTDatabase - the sift database to be inserted to the database
+ * @param imagesPath - the path to the images
+ * @param imagesSuffix - the suffix of the images
+ * @param imagesPrefix - the prefix of the images
+ * @param numOfImages - the number of the images
+ * @param numOfBins - the number of bins
+ * @param numOfFeatures - the number of features
+ * @return NULL if error occurred, otherwise return featuresPerImage
  */
 
 int* getHistogramsAndSiftDatabase(SPPoint**** RGBHistograms,
