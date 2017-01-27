@@ -182,8 +182,6 @@ void destroyHistOrSIFT(SPPoint** toDestroy);
  * @param validationArray -array to free
  */
 void destroyValidationArray(char** validationArray);
-
-
 /*
  * getHistogramsAndSiftDatabase
  * creates sift and histograms databases

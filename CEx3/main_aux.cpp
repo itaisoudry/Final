@@ -260,6 +260,7 @@ char* queryOrTerminate() {
 	}
 	if (input[0] == '#') {
 		printf(MSG_EXITING);
+
 		return NULL;
 	}
 	char* newPath = (char*) malloc(MAX_STRING * sizeof(char));
@@ -272,6 +273,7 @@ char* queryOrTerminate() {
 	strtok(newPath, "\n");
 	free(input);
 	return newPath;
+
 }
 void validateCharAllocation(char** validationArray, int size) {
 	int index = 0;
