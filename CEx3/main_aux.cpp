@@ -269,7 +269,7 @@ char* queryOrTerminate() {
 	}
 	strcpy(newPath, "./");
 	strcat(newPath, input);
-	strtok(newPath,"\n");
+	strtok(newPath, "\n");
 	free(input);
 	return newPath;
 }
@@ -333,4 +333,22 @@ void destroyValidationArrayBySize(char** validationArray, int size) {
 		}
 	}
 	free(validationArray);
+}
+
+char* trimImageNameFromPath(char* path) {
+	char* imageName = (char*)malloc(MAX_FILE_NAME*sizeof(char));
+	//if allocation failed, return path - cause the proccess is going to end anyway...
+	if(imageName==NULL){
+		return path;
+	}
+	char* token;
+	token = strtok(path,"/");
+	while(token!=NULL) {
+		token=strtok(NULL,"/");
+		if(token!=NULL) {
+			strcpy(imageName,token);
+		}
+	}
+
+	return imageName;
 }

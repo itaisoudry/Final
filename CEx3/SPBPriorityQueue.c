@@ -1,183 +1,243 @@
+/*
+ * SPBPriorityQueue.c
+ *
+ *  Created on: Dec 19, 2016
+ *      Author: soudry
+ */
 #include "SPBPriorityQueue.h"
 #include <stdlib.h>
-#include <assert.h>
-#include <string.h>
-#include <stdbool.h>
 #include <stdio.h>
-
-
-//**SP ELEMENT**//
-
-struct sp_bp_queue_t{
+#include <string.h>
+#include <assert.h>
+struct sp_bp_queue_t {
 	int maxSize;
-	BPQueueElement** list;
 	int size;
+	int start;
+	BPQueueElement *queue;
 };
-/**
- * Allocates a new element in the memory, with index and value as specified.
- * @assert(value>=0)
- * @return -	NULL if memory allocation failure occured
-  				Otherwise, returns pointer to the new elemnt
- */
-BPQueueElement* spElementCreate(int index, double value){
-	BPQueueElement* res = (BPQueueElement*) malloc(sizeof(*res));
-	if(res == NULL) return NULL;
-	res->index = index;
-	res->value = value;
-	return res;
-}
 
-int spElementGetIndex(BPQueueElement* elem){
-	if(elem==NULL) return -1;
-	return elem->index;
-}
-
-
-//**SP BP QUEUE**//
-
-SPBPQueue* spBPQueueCreate(int maxSize){
-	assert(maxSize > 0);
-	SPBPQueue* res = (SPBPQueue*) malloc(sizeof(*res)); // sizeof(*res) == sizeof(SPBPQueue)
-	if(res == NULL) return NULL;
-	res->maxSize = maxSize;
-	res->size = 0;
-	res->list = (BPQueueElement**) malloc(sizeof(BPQueueElement*) * maxSize);
-	if(res->list == NULL) {
-		free(res);
+SPBPQueue* spBPQueueCreate(int maxSize) {
+	int index = 0;
+	if (maxSize < 0) {
 		return NULL;
 	}
-	return res;
-}
-
-SPBPQueue* spBPQueueCopy(SPBPQueue* source){
-	assert (source!=NULL);
-	SPBPQueue* res = spBPQueueCreate(source->maxSize);
-	if(res == NULL) return NULL;
-	res->size = source->size;
-	for(int i=0;i<(res->size);i++){
-		(res->list)[i] = spElementCreate(source->list[i]->index,source->list[i]->value);
+	SPBPQueue *newQueue = (SPBPQueue*) malloc(sizeof(SPBPQueue));
+	if (newQueue == NULL) {
+		return NULL;
 	}
-	return res;
-}
-
-void spBPQueueDestroy(SPBPQueue* source){
-	if (source == NULL) return;
-	spBPQueueClear(source);
-	free(source->list);
-	free(source);
-	return;
-}
-
-void spBPQueueClear(SPBPQueue* source){
-	if (source == NULL) return;
-	for (int i=0; i<source->size; i++){
-		free(source->list[i]);
+	newQueue->maxSize = maxSize;
+	newQueue->start = 0;
+	newQueue->size = -1;
+	newQueue->queue = (BPQueueElement*) malloc(
+			maxSize * sizeof(BPQueueElement));
+	if (newQueue->queue == NULL) {
+		return NULL;
 	}
-	source->size=0;
+	//set default index to -1
+	for (index = 0; index < maxSize; index++) {
+		newQueue->queue[index].index = -1;
+	}
+	return newQueue;
 }
 
-//contract - -1 if null
-int spBPQueueSize(SPBPQueue* source){
-	if (source == NULL) return -1;
-	return source->size;
+SPBPQueue* spBPQueueCopy(SPBPQueue* source) {
+	int index = 0;
+	SPBPQueue *copiedQueue = (SPBPQueue*) malloc(sizeof(SPBPQueue));
+	if (copiedQueue == NULL) {
+		return NULL;
+	}
+	copiedQueue->maxSize = source->maxSize;
+	copiedQueue->start = source->start;
+	copiedQueue->size = source->size;
+	copiedQueue->queue = (BPQueueElement*) malloc(
+			source->maxSize * sizeof(BPQueueElement));
+	if (copiedQueue->queue == NULL) {
+		return NULL;
+	}
+	for (index = 0; index < source->maxSize; index++) {
+		//copy only valid elements.(since we iterate later using modulo size we need to take care of this edge case)
+		if (source->queue[index].index != -1) {
+			copiedQueue->queue[index].index = source->queue[index].index;
+			copiedQueue->queue[index].value = source->queue[index].value;
+		}
+	}
+
+	return copiedQueue;
 }
 
-//contract - -1 if null
-int spBPQueueGetMaxSize(SPBPQueue* source){
-	if (source == NULL) return -1;
+void spBPQueueDestroy(SPBPQueue* source) {
+	if (source != NULL) {
+		free(source->queue);
+		free(source);
+	}
+}
+
+void spBPQueueClear(SPBPQueue* source) {
+	if (source != NULL) {
+		free(source->queue);
+		source->queue = (BPQueueElement*) malloc(sizeof(BPQueueElement));
+		if (source->queue == NULL) {
+			printf("Error allocating memory");
+		}
+
+	}
+}
+
+int spBPQueueSize(SPBPQueue* source) {
+	if (source == NULL) {
+		return -1;
+	}
+	return source->size + 1;
+}
+
+int spBPQueueGetMaxSize(SPBPQueue* source) {
+	if (source == NULL) {
+		return -1;
+	}
 	return source->maxSize;
 }
 
+SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue* source, int index, double value) {
+	int i = source->start, swapIndex, size;
+	int maxSize = source->maxSize;
+	bool found = false;
+	BPQueueElement *newElement;
+	if (source == NULL || index < 0) {
+		return SP_BPQUEUE_INVALID_ARGUMENT;
+	}
+	newElement = (BPQueueElement*) malloc(sizeof(BPQueueElement));
+	//we assume that if the allocation didn't succeed is cause of memory problems.
+	if (newElement == NULL) {
+		printf("Error allocating memory");
+		return SP_BPQUEUE_OUT_OF_MEMORY;
+	}
+	if ((source == NULL) || (index < 0)) {
+		return SP_BPQUEUE_INVALID_ARGUMENT;
+	}
 
-SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue* source, int index, double value){
-	if (source == NULL || value < 0) return SP_BPQUEUE_INVALID_ARGUMENT;
-
-	bool full = spBPQueueIsFull(source);
-	if (full && (value>spBPQueueMaxValue(source) || (value==spBPQueueMaxValue(source)&&index>=spBPQueueMaxValueIndex(source))))
+	newElement->index = index;
+	newElement->value = value;
+	//actual size is the source size +1 cause size starts from -1 incase of empty array
+	size = source->size + 1;
+	swapIndex = size - 1;
+	if (size == maxSize) {
+		if (value > (source->queue[size - 1]).value) {
 			return SP_BPQUEUE_FULL;
-
-	BPQueueElement* new_elem = spElementCreate(index,value);
-	if (new_elem == NULL) return SP_BPQUEUE_OUT_OF_MEMORY;
-
-	int i; 						// i will be the right index to insert the new element
-	if (full){ 					//move from left to right, moving elements to make space
-		free(source->list[0]); 	//delete max element in queue;
-		for(i = 0; (i < (source->size-1)) && ( (value < (source->list[i+1]->value)) ||
-											   ( (value==(source->list[i+1]->value)) &&
-												 (index<(source->list[i+1]->index)) 	) )
-			; i++){
-			source->list[i] = source->list[i+1];
 		}
-	}
-	else{ 						//move from right to left, moving elements to make space;
-		for (i=(source->size); (i>0) && ( (value > source->list[i-1]->value) ||
-										  ( (value==source->list[i-1]->value) &&
-											(index>(source->list[i-1]->index)) 		) )
-			; i--){
-			source->list[i] = source->list[i-1];
+		if (value == (source->queue[size - 1]).value) {
+			(source->queue[size - 1]) = *newElement;
+			return SP_BPQUEUE_SUCCESS;
 		}
-		source->size++;
+		swapIndex--;
 	}
-	//now the i_th place in the list is the right place to insert the new element
-	source->list[i] = new_elem;
+//while bigger value not found and not finished iterating over array
+	while ((i % maxSize) < size && !found) {
+		//if bigger value found
+		if ((source->queue[i]).value > value) {
+			//shift array to the right by one
+			while (swapIndex >= i) {
+				source->queue[swapIndex + 1].index =
+						source->queue[swapIndex].index;
+				source->queue[swapIndex + 1].value =
+						source->queue[swapIndex].value;
+				swapIndex--;
+			}
+			source->queue[i] = *newElement;
+			//break loop
+			found = true;
+		}
+		i = (i + 1) % maxSize;
+	}
+	if (!found) {
+		source->queue[i] = *newElement;
+	}
+	if (size < maxSize)
+		source->size = source->size + 1;
+	return SP_BPQUEUE_SUCCESS;
+
+}
+
+SP_BPQUEUE_MSG spBPQueueDequeue(SPBPQueue* source) {
+	if (source == NULL)
+		return SP_BPQUEUE_INVALID_ARGUMENT;
+	if (source->size == -1) {
+		return SP_BPQUEUE_EMPTY;
+	}
+	source->start = (source->start + 1) % source->maxSize;
+	source->size = source->size - 1;
 	return SP_BPQUEUE_SUCCESS;
 }
 
-SP_BPQUEUE_MSG spBPQueueDequeue(SPBPQueue* source){
-	if (source == NULL) return SP_BPQUEUE_INVALID_ARGUMENT;
-	if (source->size == 0) return SP_BPQUEUE_EMPTY;
-	free(source->list[--(source->size)]); //free space and decrease size;
+SP_BPQUEUE_MSG spBPQueuePeek(SPBPQueue* source, BPQueueElement* res) {
+	if (res == NULL || source == NULL) {
+		return SP_BPQUEUE_INVALID_ARGUMENT;
+	}
+	if (source->size == -1) {
+		return SP_BPQUEUE_EMPTY;
+	}
+	BPQueueElement* firstElement = &source->queue[source->start];
+	*res = *firstElement;
 	return SP_BPQUEUE_SUCCESS;
 }
 
-SP_BPQUEUE_MSG spBPQueuePeek(SPBPQueue* source, BPQueueElement* res){
-	if(source == NULL || res == NULL) return SP_BPQUEUE_INVALID_ARGUMENT;
-	if(spBPQueueIsEmpty(source)) return SP_BPQUEUE_EMPTY;
-	BPQueueElement* elem = source->list[source->size-1];
-	res->index = elem->index;
-	res->value = elem->value;
+SP_BPQUEUE_MSG spBPQueuePeekLast(SPBPQueue* source, BPQueueElement* res) {
+	if (res == NULL || source == NULL) {
+		return SP_BPQUEUE_INVALID_ARGUMENT;
+	}
+	if (source->size == -1) {
+		return SP_BPQUEUE_EMPTY;
+	}
+
+	BPQueueElement* lastElement = &source->queue[source->size];
+	*res = *lastElement;
 	return SP_BPQUEUE_SUCCESS;
 }
 
-SP_BPQUEUE_MSG spBPQueuePeekLast(SPBPQueue* source, BPQueueElement* res){
-	if(source == NULL || res == NULL) return SP_BPQUEUE_INVALID_ARGUMENT;
-	if(spBPQueueIsEmpty(source)) return SP_BPQUEUE_EMPTY;
-	BPQueueElement* elem = source->list[0];
-	res->index = elem->index;
-	res->value = elem->value;
-	return SP_BPQUEUE_SUCCESS;
-}
-
-
-double spBPQueueMinValue(SPBPQueue* source){
-	assert (source!=NULL);
-	if (source->size==0){
+double spBPQueueMinValue(SPBPQueue* source) {
+	if (source == NULL) {
+		printf("Invalid argument");
 		return -1;
 	}
-	return source->list[(source->size-1)]->value;
-}
-
-double spBPQueueMaxValue(SPBPQueue* source){
-	assert (source!=NULL);
-	if (source->size==0){
+	BPQueueElement *result = (BPQueueElement*) malloc(sizeof(BPQueueElement));
+	if (result == NULL) {
+		printf("Error allocating memory");
 		return -1;
 	}
-	return source->list[0]->value;
+	SP_BPQUEUE_MSG resultMsg = spBPQueuePeek(source, result);
+	if (resultMsg != SP_BPQUEUE_SUCCESS)
+		return -1;
+	return result->value;
 }
-int spBPQueueMaxValueIndex(SPBPQueue* source){
-	assert (source!=NULL);
-	if (source->size==0){
+
+double spBPQueueMaxValue(SPBPQueue* source) {
+	if (source == NULL) {
+		printf("Invalid argument");
 		return -1;
 	}
-	return source->list[0]->index;
+	BPQueueElement *result = (BPQueueElement*) malloc(sizeof(BPQueueElement));
+	if (result == NULL) {
+		printf("Error allocating memory");
+		return -1;
+	}
+	SP_BPQUEUE_MSG resultMsg = spBPQueuePeekLast(source, result);
+	if (resultMsg != SP_BPQUEUE_SUCCESS)
+		return -1;
+	return result->value;
 }
 
-bool spBPQueueIsEmpty(SPBPQueue* source){
-	assert (source!=NULL);
-	return (source->size == 0);
+bool spBPQueueIsEmpty(SPBPQueue* source) {
+	if (source == NULL) {
+		printf("Invalid argument");
+		return false;
+	}
+	return spBPQueueSize(source) == 0 ? true : false;
 }
 
-bool spBPQueueIsFull(SPBPQueue* source){
-	assert (source!=NULL);
-	return (source->size == source->maxSize);
+bool spBPQueueIsFull(SPBPQueue* source) {
+	if (source == NULL) {
+		printf("Invalid argument");
+		return false;
+	}
+	return spBPQueueSize(source) == spBPQueueGetMaxSize(source) ? true : false;
 }
+

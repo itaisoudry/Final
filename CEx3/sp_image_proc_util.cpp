@@ -36,8 +36,7 @@ SPPoint** spGetRGBHist(const char* str, int imageIndex, int nBins) {
 	}
 	src = cv::imread(str, CV_LOAD_IMAGE_COLOR);
 	if (src.empty()) {
-		//TODO-change to couldn't load img+str
-		printf(ERROR_LOAD_IMAGE, str);
+		printf(ERROR_LOAD_IMAGE, trimImageNameFromPath((char*)str));
 		return NULL;
 	}
 	//separate the img in 3 places (b,g,r)
@@ -110,8 +109,7 @@ SPPoint** spGetSiftDescriptors(const char* str, int imageIndex,
 	}
 	src = cv::imread(str, CV_LOAD_IMAGE_GRAYSCALE);
 	if (src.empty()) {
-		//TODO-change to couldn't load img+str
-		printf(ERROR_LOAD_IMAGE, str);
+		printf(ERROR_LOAD_IMAGE, trimImageNameFromPath((char*)str));
 		return NULL;
 	}
 
