@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
+#include <ctype.h>
 #include "SPLogger.h"
 #include "Utils/AllocationHandler.h"
 #include "Utils/ResponseCodes.h"
@@ -23,6 +25,11 @@
 
 #define EMPTY_STR ""
 #define LINE_LENGTH 1025
+#define COMMENT '#'
+#define EQUALS '='
+#define SPACE ' '
+#define END_LINE '\0'
+
 
 #define NEGATIVE -1
 /**

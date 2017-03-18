@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "SPLogger.h"
 //File open mode
 #define SP_LOGGER_OPEN_MODE "w"
 

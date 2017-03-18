@@ -16,7 +16,7 @@
 #define SMART_MALLOC(type, ptr, size)\
 		ptr = (type) malloc(size);\
 		if(ptr==NULL){\
-			returnValue = ALLOCATION_FAILED;\
+			resultValue = ALLOCATION_FAILED;\
 			goto error;\
 		}
 
@@ -33,13 +33,13 @@
 		}else{\
 		ptr = (type) realloc(ptr, size);\
 		if(ptr==NULL){\
-			returnValue = ALLOCATION_FAILED;\
+			resultValue = ALLOCATION_FAILED;\
 			goto error;\
 		}}
 
 #define SMART_FUNCTION_CALL(function)\
-	returnValue = function;\
-	if(returnValue!=SUCCESS){\
+	resultValue = function;\
+	if(resultValue!=SUCCESS){\
 		goto error;\
 	}
 #endif /* UTILS_ALLOCATIONHANDLER_H_ */
