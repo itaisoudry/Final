@@ -9,6 +9,19 @@ int extractConfigDataFromFile(const char* filename, SPConfig config);
 int setConfigDefaultValues(SPConfig config);
 int extractDataFromLine(SPConfig config, char* line);
 char* trimSpacesFromBothSides(char* line);
+int validate(char* key, char* value);
+int validateImagesDirectory(char* value);
+int validateImagesPrefix(char* value);
+int validateImagesSuffix(char* value);
+int validateLoggerFilename(char* value);
+int validatePcaFilename(char* value);
+int validateNumOfFeatures(char* value);
+int validateNumOfSimilarImages(char* value);
+int validateKnn(char* value);
+int validateLoggerLevel(char* value);
+int validateMinGui(char* value);
+int validateExtractionMode(char* value);
+int validateKDTreeSplitMethod(char* value);
 SP_CONFIG_MSG responseCodeToConfigMessage(ResponseCode code);
 SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg) {
 	SPConfig config = NULL;
@@ -202,8 +215,8 @@ int extractDataFromLine(SPConfig config, char* line) {
 	value = equalsPtr + 1;
 	*equalsPtr = END_LINE;
 	//trim key value
-	key=trimSpacesFromBothSides(key);
-	value=trimSpacesFromBothSides(value);
+	key = trimSpacesFromBothSides(key);
+	value = trimSpacesFromBothSides(value);
 	//key is invalid
 	if (strchr(key, SPACE) != NULL) {
 		printf("ERROR KEY NOT VALID: %s\n", key);
@@ -227,7 +240,100 @@ char* trimSpacesFromBothSides(char* line) {
 
 	return strndup(line, l);
 }
+int validate(char* key, char* value) {
+	int resultValue = SUCCESS;
+	if (strcmp(key, SP_IMAGES_DIR) == 0) {
+		SMART_FUNCTION_CALL(validateImagesDirectory(value));
+	}
+	if (strcmp(key, SP_IMAGES_PREFIX) == 0) {
 
+	}
+	if (strcmp(key, SP_IMAGES_SUFFIX) == 0) {
+
+	}
+	if (strcmp(key, SP_LOGGER_FILENAME) == 0) {
+
+	}
+	if (strcmp(key, SP_PCA_FILENAME) == 0) {
+
+	}
+	if (strcmp(key, SP_NUM_OF_IMAGES) == 0) {
+
+	}
+	if (strcmp(key, SP_PCA_DIM) == 0) {
+
+	}
+	if (strcmp(key, SP_NUM_FEATURES) == 0) {
+
+	}
+	if (strcmp(key, SP_NUM_SIMILAR_IMAGES) == 0) {
+
+	}
+	if (strcmp(key, SP_KNN) == 0) {
+
+	}
+	if (strcmp(key, SP_LOGGER_LEVEL) == 0) {
+
+	}
+	if (strcmp(key, SP_MIN_GUI) == 0) {
+
+	}
+	if (strcmp(key, SP_EXTRACTION_MODE) == 0) {
+
+	}
+	if (strcmp(key, SP_KDTREE_SPLIT_METHOD) == 0) {
+
+	}
+	return resultValue;
+}
+int validateImagesDirectory(char* value) {
+	int resultValue = SUCCESS;
+	return resultValue;
+}
+int validateImagesPrefix(char* value) {
+	int resultValue = SUCCESS;
+	return resultValue;
+}
+int valdiateImagesSuffix(char* value) {
+	int resultValue = SUCCESS;
+	return resultValue;
+}
+int validateLoggerFilename(char* value) {
+	int resultValue = SUCCESS;
+	return resultValue;
+}
+int validatePcaFilename(char* value) {
+	int resultValue = SUCCESS;
+	return resultValue;
+}
+int validateNumOfFeatures(char* value) {
+	int resultValue = SUCCESS;
+	return resultValue;
+}
+int validateNumOfSimilarImages(char* value) {
+	int resultValue = SUCCESS;
+	return resultValue;
+}
+int validateKnn(char* value) {
+	int resultValue = SUCCESS;
+	return resultValue;
+}
+int validateLoggerLevel(char* value) {
+	int resultValue = SUCCESS;
+	return resultValue;
+}
+int validateMinGui(char* value) {
+	int resultValue = SUCCESS;
+	return resultValue;
+}
+int validateExtractionMode(char* value) {
+	int resultValue = SUCCESS;
+	return resultValue;
+}
+int validateKDTreeSplitMethod(char* value) {
+	int resultValue = SUCCESS;
+	return resultValue;
+}
 SP_CONFIG_MSG responseCodeToConfigMessage(ResponseCode code) {
 	SP_CONFIG_MSG msg = 0;
 	switch (code) {

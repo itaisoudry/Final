@@ -23,13 +23,30 @@
 #define DEFAULT_SP_KDTREE_SPLOT_METHOD MAX_SPREAD
 #define DEFAULT_SP_LOGGER_LEVEL 3
 
+/**
+ * Config keys
+ */
+#define SP_IMAGES_DIR "spImagesDirectory"
+#define SP_IMAGES_PREFIX "spImagesPrefix"
+#define SP_IMAGES_SUFFIX "spImagesSuffix"
+#define SP_LOGGER_FILENAME "spLoggerFilename"
+#define SP_PCA_FILENAME "spPCAFilename"
+#define SP_NUM_OF_IMAGES "spNumOfImages"
+#define SP_PCA_DIM "spPCADimension"
+#define SP_NUM_FEATURES "spNumOfFeatures"
+#define SP_NUM_SIMILAR_IMAGES "spNumOfSimilarImages"
+#define SP_KNN "spKNN"
+#define SP_LOGGER_LEVEL "spLoggerLevel"
+#define SP_MIN_GUI "spMinimalGUI"
+#define SP_EXTRACTION_MODE "spExtractionMode"
+#define SP_KDTREE_SPLIT_METHOD "spKDTreeSplitMethod"
+
 #define EMPTY_STR ""
 #define LINE_LENGTH 1025
 #define COMMENT '#'
 #define EQUALS '='
 #define SPACE ' '
 #define END_LINE '\0'
-
 
 #define NEGATIVE -1
 /**
@@ -49,9 +66,11 @@ typedef enum sp_config_msg_t {
 	SP_CONFIG_INDEX_OUT_OF_RANGE,
 	SP_CONFIG_SUCCESS
 } SP_CONFIG_MSG;
+
 typedef enum sp_kdtree_split_method_t {
 	RANDOM, MAX_SPREAD, INCREMENTAL
-} SP_KDTREE_SPLIT_METHOD;
+}SP_KDTREE_SPLIT_METHODS;
+
 typedef struct sp_config_t {
 	char* spImagesDirectory;
 	char* spImagesPrefix;
@@ -66,9 +85,10 @@ typedef struct sp_config_t {
 	int spKNN;
 	int spLoggerLevel;
 
-	bool spMinimalGUI;bool spExtractionMode;
+	bool spMinimalGUI;
+	bool spExtractionMode;
 
-	SP_KDTREE_SPLIT_METHOD spKDTreeSplitMethod;
+	SP_KDTREE_SPLIT_METHODS spKDTreeSplitMethod;
 
 }* SPConfig;
 
