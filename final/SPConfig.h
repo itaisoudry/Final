@@ -9,6 +9,11 @@
 #include "SPLogger.h"
 #include "Utils/AllocationHandler.h"
 #include "Utils/ResponseCodes.h"
+
+/**
+ * Formats
+ */
+#define ERROR_FORMAT "File:%s\nLine:%d\nMessage:%s"
 /**
  * Config Defaults
  */
@@ -47,6 +52,12 @@
 #define EQUALS '='
 #define SPACE ' '
 #define END_LINE '\0'
+#define INVALID_CFG_LINE "Invalid configuration line"
+#define INVALID_CFG_VALUE "Invalid value - constraint not met"
+#define JPG ".jpg"
+#define BMP ".bmp"
+#define GIF ".gif"
+#define PNG ".png"
 
 #define NEGATIVE -1
 /**
