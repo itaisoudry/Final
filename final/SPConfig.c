@@ -245,28 +245,25 @@ int validate(char* key, char* value, int lineNumber, char* filename) {
 	if (strcmp(key, SP_IMAGES_PREFIX) == 0) {
 		//if images prefix contains spaces
 		if (strchr(value, SPACE) != NULL) {
-
+			resultValue = CFG_INVALID_LINE;
 		}
 	}
 	if (strcmp(key, SP_IMAGES_SUFFIX) == 0) {
 		//suffix must be gif/bmp/jps/png
 		if (strcmp(value, BMP) == 0 && strcmp(value, JPG) == 0
 				&& strcmp(value, GIF) == 0 && strcmp(value, PNG)) {
-			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
 			resultValue = CFG_INVALID_LINE;
 		}
 	}
 	if (strcmp(key, SP_LOGGER_FILENAME) == 0) {
 		//if filename contains spaces
 		if (strchr(value, SPACE) != NULL) {
-			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
 			resultValue = CFG_INVALID_LINE;
 		}
 	}
 	if (strcmp(key, SP_PCA_FILENAME) == 0) {
 		//if filename conains spaces
 		if (strchr(value, SPACE) != NULL) {
-			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
 			resultValue = CFG_INVALID_LINE;
 		}
 	}
@@ -274,7 +271,6 @@ int validate(char* key, char* value, int lineNumber, char* filename) {
 		intValue = atoi(value);
 		//value must be positive - if zero, means it is not valid.
 		if (intValue <= 0) {
-			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
 			resultValue = CFG_INVALID_LINE;
 		}
 	}
@@ -282,7 +278,6 @@ int validate(char* key, char* value, int lineNumber, char* filename) {
 		intValue = atoi(value);
 		//number in range between 10 and 28
 		if (intValue < 10 || intValue > 28) {
-			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
 			resultValue = CFG_INVALID_LINE;
 		}
 	}
@@ -290,7 +285,6 @@ int validate(char* key, char* value, int lineNumber, char* filename) {
 		intValue = atoi(value);
 		//value must be positive
 		if (intValue >= 0) {
-			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
 			resultValue = CFG_INVALID_LINE;
 		}
 	}
@@ -298,7 +292,6 @@ int validate(char* key, char* value, int lineNumber, char* filename) {
 		intValue = atoi(value);
 		//value must be positive
 		if (intValue >= 0) {
-			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
 			resultValue = CFG_INVALID_LINE;
 		}
 	}
@@ -306,7 +299,6 @@ int validate(char* key, char* value, int lineNumber, char* filename) {
 		intValue = atoi(value);
 		//value must be positive
 		if (intValue >= 0) {
-			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
 			resultValue = CFG_INVALID_LINE;
 		}
 	}
@@ -314,28 +306,24 @@ int validate(char* key, char* value, int lineNumber, char* filename) {
 		intValue = atoi(value);
 		//value must be positive
 		if (intValue < 1 || intValue > 4) {
-			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
 			resultValue = CFG_INVALID_LINE;
 		}
 	}
 	if (strcmp(key, SP_MIN_GUI) == 0) {
 		//if not 'true' or 'false'
 		if (strcmp(value, "true") == 0 && strcmp(value, "false") == 0) {
-			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
 			resultValue = CFG_INVALID_LINE;
 		}
 	}
 	if (strcmp(key, SP_EXTRACTION_MODE) == 0) {
 		//if not 'true' or 'false'
 		if (strcmp(value, "true") == 0 && strcmp(value, "false") == 0) {
-			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
 			resultValue = CFG_INVALID_LINE;
 		}
 	}
 	if (strcmp(key, SP_KDTREE_SPLIT_METHOD) == 0) {
 		if (intValue != RANDOM && intValue != MAX_SPREAD
 				&& intValue != INCREMENTAL) {
-			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
 			resultValue = CFG_INVALID_LINE;
 		}
 	}
