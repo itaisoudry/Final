@@ -217,10 +217,10 @@ int extractDataFromLine(SPConfig config, char* filename, char* line,
 	if (strchr(key, SPACE) != NULL || strchr(value, SPACE) != NULL) {
 		printErrorMessage(filename, lineNumber, INVALID_CFG_LINE);
 	}
-
+	SMART_FUNCTION_CALL(validate(key, value, lineNumber, filename));
 	printf("ALL GOOD: KEY: %s, VALUE: %s\n\n", key, value);
 	return resultValue;
-	//error: print error message with line number
+	error: return resultValue;
 
 }
 char* trimSpacesFromBothSides(char* line) {
