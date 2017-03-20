@@ -327,11 +327,8 @@ int validate(char* key, char* value, int lineNumber, char* filename) {
 			resultValue = CFG_INVALID_LINE;
 		}
 	}
-	return resultValue;
-	error: if (resultValue == CFG_INVALID_LINE)
-		printErrorMessage(filename, lineNumber, INVALID_CFG_LINE);
-	else
-		printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
+	if (resultValue == CFG_INVALID_LINE)
+			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
 	return resultValue;
 }
 void printErrorMessage(char* filename, int lineNumber, char* msg) {
