@@ -13,21 +13,6 @@ char* trimSpacesFromBothSides(char* line);
 void printErrorMessage(char* filename, int lineNumber, char* msg);
 
 int validate(char* key, char* value, int lineNumber, char* filename);
-int validateImagesDirectory(char* value, int lineNumber);
-int validateImagesPrefix(char* value, int lineNumber);
-int validateImagesSuffix(char* value, int lineNumber);
-int validateLoggerFilename(char* value, int lineNumber);
-int validatePcaFilename(char* value, int lineNumber);
-int validatePcaDim(char* value, int lineNumber);
-int validateNumOfFeatures(char* value, int lineNumber);
-int validateNumOfSimilarImages(char* value, int lineNumber);
-int validateKnn(char* value, int lineNumber);
-int validateLoggerLevel(char* value, int lineNumber);
-int validateMinGui(char* value, int lineNumber);
-int validateExtractionMode(char* value, int lineNumber);
-int validateKDTreeSplitMethod(char* value, int lineNumber);
-int validateNumberOfImages(char* value, int lineNumber);
-int validateSplitMethod(char* value, int lineNumber);
 SP_CONFIG_MSG responseCodeToConfigMessage(ResponseCode code);
 SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg) {
 	SPConfig config = NULL;
@@ -250,135 +235,115 @@ char* trimSpacesFromBothSides(char* line) {
 }
 int validate(char* key, char* value, int lineNumber, char* filename) {
 	int resultValue = SUCCESS;
+	int intValue = 0;
 	if (strcmp(key, SP_IMAGES_DIR) == 0) {
-		SMART_FUNCTION_CALL(validateImagesDirectory(value, lineNumber));
+		//if dir contains spaces
+		if (strchr(value, SPACE) != NULL) {
+
+		}
 	}
 	if (strcmp(key, SP_IMAGES_PREFIX) == 0) {
-		SMART_FUNCTION_CALL(validateImagesPrefix(value, lineNumber));
+		//if images prefix contains spaces
+		if (strchr(value, SPACE) != NULL) {
+
+		}
 	}
 	if (strcmp(key, SP_IMAGES_SUFFIX) == 0) {
-		SMART_FUNCTION_CALL(validateImagesSuffix(value, lineNumber));
+		//suffix must be gif/bmp/jps/png
+		if (strcmp(value, BMP) == 0 && strcmp(value, JPG) == 0
+				&& strcmp(value, GIF) == 0 && strcmp(value, PNG)) {
+			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
+			resultValue = CFG_INVALID_LINE;
+		}
 	}
 	if (strcmp(key, SP_LOGGER_FILENAME) == 0) {
-		SMART_FUNCTION_CALL(validateLoggerFilename(value, lineNumber));
+		//if filename contains spaces
+		if (strchr(value, SPACE) != NULL) {
+			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
+			resultValue = CFG_INVALID_LINE;
+		}
 	}
 	if (strcmp(key, SP_PCA_FILENAME) == 0) {
-		SMART_FUNCTION_CALL(validatePcaFilename(value, lineNumber));
+		//if filename conains spaces
+		if (strchr(value, SPACE) != NULL) {
+			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
+			resultValue = CFG_INVALID_LINE;
+		}
 	}
 	if (strcmp(key, SP_NUM_OF_IMAGES) == 0) {
-		SMART_FUNCTION_CALL(validateNumberOfImages(value, lineNumber));
+		intValue = atoi(value);
+		//value must be positive - if zero, means it is not valid.
+		if (intValue <= 0) {
+			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
+			resultValue = CFG_INVALID_LINE;
+		}
 	}
 	if (strcmp(key, SP_PCA_DIM) == 0) {
-		SMART_FUNCTION_CALL(validatePcaDim(value, lineNumber));
+		intValue = atoi(value);
+		//number in range between 10 and 28
+		if (intValue < 10 || intValue > 28) {
+			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
+			resultValue = CFG_INVALID_LINE;
+		}
 	}
 	if (strcmp(key, SP_NUM_FEATURES) == 0) {
-		SMART_FUNCTION_CALL(validateNumOfFeatures(value, lineNumber));
+		intValue = atoi(value);
+		//value must be positive
+		if (intValue >= 0) {
+			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
+			resultValue = CFG_INVALID_LINE;
+		}
 	}
 	if (strcmp(key, SP_NUM_SIMILAR_IMAGES) == 0) {
-		SMART_FUNCTION_CALL(validateNumOfSimilarImages(value, lineNumber));
+		intValue = atoi(value);
+		//value must be positive
+		if (intValue >= 0) {
+			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
+			resultValue = CFG_INVALID_LINE;
+		}
 	}
 	if (strcmp(key, SP_KNN) == 0) {
-		SMART_FUNCTION_CALL(validateKnn(value, lineNumber));
+		intValue = atoi(value);
+		//value must be positive
+		if (intValue >= 0) {
+			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
+			resultValue = CFG_INVALID_LINE;
+		}
 	}
 	if (strcmp(key, SP_LOGGER_LEVEL) == 0) {
-		SMART_FUNCTION_CALL(validateLoggerLevel(value, lineNumber));
+		intValue = atoi(value);
+		//value must be positive
+		if (intValue < 1 || intValue > 4) {
+			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
+			resultValue = CFG_INVALID_LINE;
+		}
 	}
 	if (strcmp(key, SP_MIN_GUI) == 0) {
-		SMART_FUNCTION_CALL(validateMinGui(value, lineNumber));
+		//if not 'true' or 'false'
+		if (strcmp(value, "true") == 0 && strcmp(value, "false") == 0) {
+			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
+			resultValue = CFG_INVALID_LINE;
+		}
 	}
 	if (strcmp(key, SP_EXTRACTION_MODE) == 0) {
-		SMART_FUNCTION_CALL(validateExtractionMode(value, lineNumber));
+		//if not 'true' or 'false'
+		if (strcmp(value, "true") == 0 && strcmp(value, "false") == 0) {
+			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
+			resultValue = CFG_INVALID_LINE;
+		}
 	}
 	if (strcmp(key, SP_KDTREE_SPLIT_METHOD) == 0) {
-		SMART_FUNCTION_CALL(validateSplitMethod(value, lineNumber));
+		if (intValue != RANDOM && intValue != MAX_SPREAD
+				&& intValue != INCREMENTAL) {
+			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
+			resultValue = CFG_INVALID_LINE;
+		}
 	}
 	return resultValue;
 	error: if (resultValue == CFG_INVALID_LINE)
 		printErrorMessage(filename, lineNumber, INVALID_CFG_LINE);
 	else
 		printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
-	return resultValue;
-}
-int validateSplitMethod(char* value, int lineNumber) {
-	int resultValue = SUCCESS;
-
-	return resultValue;
-}
-int validateImagesDirectory(char* value, int lineNumber) {
-	int resultValue = SUCCESS;
-	//if path contains space
-	if (strchr(value, SPACE) != NULL) {
-		return CFG_INVALID_STRING;
-	}
-	return resultValue;
-}
-int validateImagesPrefix(char* value, int lineNumber) {
-	int resultValue = SUCCESS;
-	//if prefix contains space
-	if (strchr(value, SPACE) != NULL) {
-		return CFG_INVALID_STRING;
-	}
-	return resultValue;
-}
-int validateImagesSuffix(char* value, int lineNumber) {
-	int resultValue = SUCCESS;
-	//if suffix is not jpg / bmp / gif / png
-	if (strcmp(value, BMP) == 0 && strcmp(value, GIF) == 0
-			&& strcmp(value, JPG) == 0 && strcmp(value, PNG)) {
-		return CFG_INVALID_ARGUMENT;
-	}
-	return resultValue;
-}
-int validateLoggerFilename(char* value, int lineNumber) {
-	int resultValue = SUCCESS;
-	//logger file contains no spaces
-	if (strchr(value, SPACE) != NULL) {
-		return CFG_INVALID_STRING;
-	}
-	return resultValue;
-}
-int validatePcaFilename(char* value, int lineNumber) {
-	int resultValue = SUCCESS;
-	//if filename contains spaces
-	if (strchr(value, SPACE) != NULL) {
-		return CFG_INVALID_STRING;
-	}
-	return resultValue;
-}
-int validatePcaDim(char* value, int lineNumber) {
-	int resultValue = SUCCESS;
-	return resultValue;
-}
-int validateNumOfFeatures(char* value, int lineNumber) {
-	int resultValue = SUCCESS;
-	return resultValue;
-}
-int validateNumOfSimilarImages(char* value, int lineNumber) {
-	int resultValue = SUCCESS;
-	return resultValue;
-}
-int validateKnn(char* value, int lineNumber) {
-	int resultValue = SUCCESS;
-	return resultValue;
-}
-int validateLoggerLevel(char* value, int lineNumber) {
-	int resultValue = SUCCESS;
-	return resultValue;
-}
-int validateMinGui(char* value, int lineNumber) {
-	int resultValue = SUCCESS;
-	return resultValue;
-}
-int validateExtractionMode(char* value, int lineNumber) {
-	int resultValue = SUCCESS;
-	return resultValue;
-}
-int validateKDTreeSplitMethod(char* value, int lineNumber) {
-	int resultValue = SUCCESS;
-	return resultValue;
-}
-int validateNumberOfImages(char* value, int lineNumber) {
-	int resultValue = SUCCESS;
 	return resultValue;
 }
 void printErrorMessage(char* filename, int lineNumber, char* msg) {
