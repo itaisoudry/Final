@@ -13,15 +13,35 @@ void printConfig(SPConfig config);
 bool test() {
 	SPConfig config = NULL;
 	SP_CONFIG_MSG msg = SP_CONFIG_SUCCESS;
-	config = spConfigCreate("myconfig.config", &msg);
+	config = spConfigCreate("myconfig.cfg", &msg);
+	printf("%d", msg);
+	config = spConfigCreate("unit_tests/ConfigFiles/BadEnumExtractionMode.txt", &msg);
+	printf("%d", msg);
+	config = spConfigCreate("unit_tests/ConfigFiles/NoDirectory.txt", &msg);
+	printf("%d", msg);
+	config = spConfigCreate("unit_tests/ConfigFiles/NoNumberOfImages.txt", &msg);
+	printf("%d", msg);
+	config = spConfigCreate("unit_tests/ConfigFiles/NoPrefix.txt", &msg);
+	printf("%d", msg);
+	config = spConfigCreate("unit_tests/ConfigFiles/NoSuffix.txt", &msg);
+	printf("%d", msg);
+	config = spConfigCreate("unit_tests/ConfigFiles/PositiveNumberOfFeatures.txt", &msg);
+	printf("%d", msg);
 	printConfig(config);
 	return true;
 }
 int main() {
 	RUN_TEST(test);
+
 }
 
 void printConfig(SPConfig config) {
+	if (config == NULL) {
+		printf("NULL");
+		return;
+
+	}
+
 	printf("Extraction mode: %d\n", config->spExtractionMode);
 	printf("Images Directory: %s\n", config->spImagesDirectory);
 	printf("Images Prefix: %s\n", config->spImagesPrefix);

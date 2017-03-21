@@ -1,0 +1,18 @@
+# configuration file
+
+spImagesDirectory  = Directory/
+spImagesPrefix  = pre
+spImagesSuffix = .jpg1
+spNumOfImages = 17
+
+#Have default values - may not be set:
+spPCADimension = 15
+spPCAFilename = spPCAFilename7.yml
+spNumOfFeatures = 16
+spExtractionMode = true
+spMinimalGUI = false
+spNumOfSimilarImages = 5
+spKNN = 100
+spKDTreeSplitMethod = RANDOM
+spLoggerLevel = 3
+spLoggerFilename = spLoggerFilename9

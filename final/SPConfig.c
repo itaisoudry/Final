@@ -7,12 +7,13 @@
 #include "SPConfig.h"
 int extractConfigDataFromFile(const char* filename, SPConfig config);
 int setConfigDefaultValues(SPConfig config);
-int extractDataFromLine(SPConfig config, char* filename, char* line,
+int extractDataFromLine(SPConfig config, const char* filename, char* line,
 		int lineNumber);
 char* trimSpacesFromBothSides(char* line);
-void printErrorMessage(char* filename, int lineNumber, char* msg);
+void printErrorMessage(const char* filename, int lineNumber, char* msg);
 
-int validate(char* key, char* value, int lineNumber, char* filename);
+int validateAndInsert(SPConfig config, const char* filename, int lineNumber,
+		char* key, char* value);
 SP_CONFIG_MSG responseCodeToConfigMessage(ResponseCode code);
 SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg) {
 	SPConfig config = NULL;
@@ -23,6 +24,7 @@ SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg) {
 	return config;
 	error:
 	SMART_FREE(config);
+	*msg = SP_CONFIG_INVALID_ARGUMENT;
 	return NULL;
 }
 bool spConfigIsExtractionMode(const SPConfig config, SP_CONFIG_MSG* msg) {
@@ -167,15 +169,16 @@ int extractConfigDataFromFile(const char* filename, SPConfig config) {
 
 	file = fopen(filename, "r");
 	if (file == NULL) {
-		return CANNOT_OPEN_FILE;
+		return CFG_CANNOT_OPEN_FILE;
 	}
 	SMART_MALLOC(char*, line, LINE_LENGTH*sizeof(char));
+
 	while (fgets(line, LINE_LENGTH, file) != NULL) {
 		char* commentPtr = NULL;
 		//trim
 		line = trimSpacesFromBothSides(line);
 		//if first char is not '#'
-		if (line[0] != COMMENT) {
+		if (line[0] != COMMENT && strcmp(line,EMPTY_STR)) {
 			commentPtr = strchr(line, COMMENT);
 
 			if (commentPtr != NULL) {
@@ -186,7 +189,7 @@ int extractConfigDataFromFile(const char* filename, SPConfig config) {
 					extractDataFromLine(config, filename, line, lineNumber));
 			// assign variables to config
 		}
-		printf("%s\n", line);
+
 		lineNumber++;
 	}
 	return resultValue;
@@ -195,7 +198,7 @@ int extractConfigDataFromFile(const char* filename, SPConfig config) {
 	return resultValue;
 
 }
-int extractDataFromLine(SPConfig config, char* filename, char* line,
+int extractDataFromLine(SPConfig config, const char* filename, char* line,
 		int lineNumber) {
 	int resultValue = SUCCESS;
 	char* equalsPtr = NULL;
@@ -213,15 +216,149 @@ int extractDataFromLine(SPConfig config, char* filename, char* line,
 	//trim key value
 	key = trimSpacesFromBothSides(key);
 	value = trimSpacesFromBothSides(value);
-	//key or value is invalid
-	if (strchr(key, SPACE) != NULL || strchr(value, SPACE) != NULL) {
+	//key  is invalid
+	if (strchr(key, SPACE) != NULL) {
 		printErrorMessage(filename, lineNumber, INVALID_CFG_LINE);
 	}
-	SMART_FUNCTION_CALL(validate(key, value, lineNumber, filename));
-	printf("ALL GOOD: KEY: %s, VALUE: %s\n\n", key, value);
+	SMART_FUNCTION_CALL(validateAndInsert(config,filename,lineNumber,key, value));
 	return resultValue;
 	error: return resultValue;
 
+}
+
+int validateAndInsert(SPConfig config, const char* filename, int lineNumber,
+		char* key, char* value) {
+	int resultValue = SUCCESS;
+	int intValue = 0;
+	if (strcmp(key, SP_IMAGES_DIR) == 0) {
+		//if dir contains spaces
+		if (strchr(value, SPACE) != NULL) {
+			resultValue = CFG_INVALID_ARGUMENT;
+		} else {
+			strcpy(config->spImagesDirectory, value);
+		}
+	}
+	if (strcmp(key, SP_IMAGES_PREFIX) == 0) {
+		//if images prefix contains spaces
+		if (strchr(value, SPACE) != NULL) {
+			resultValue = CFG_INVALID_ARGUMENT;
+		} else {
+			strcpy(config->spImagesPrefix, value);
+		}
+	}
+	if (strcmp(key, SP_IMAGES_SUFFIX) == 0) {
+		//suffix must be gif/bmp/jps/png
+		if (strcmp(value, BMP) == 0 && strcmp(value, JPG) == 0
+				&& strcmp(value, GIF) == 0 && strcmp(value, PNG)) {
+			resultValue = CFG_INVALID_ARGUMENT;
+		} else {
+			strcpy(config->spImagesSuffix, value);
+		}
+	}
+	if (strcmp(key, SP_LOGGER_FILENAME) == 0) {
+		//if filename contains spaces
+		if (strchr(value, SPACE) != NULL) {
+			resultValue = CFG_INVALID_ARGUMENT;
+		} else {
+			strcpy(config->spLoggerFilename, value);
+		}
+	}
+	if (strcmp(key, SP_PCA_FILENAME) == 0) {
+		//if filename conains spaces
+		if (strchr(value, SPACE) != NULL) {
+			resultValue = CFG_INVALID_ARGUMENT;
+		} else {
+			strcpy(config->spPCAFilename, value);
+		}
+	}
+	if (strcmp(key, SP_NUM_OF_IMAGES) == 0) {
+		intValue = atoi(value);
+		//value must be positive - if zero, means it is not valid.
+		if (intValue <= 0) {
+			resultValue = CFG_INVALID_ARGUMENT;
+		} else {
+			config->spNumOfImages = intValue;
+		}
+	}
+	if (strcmp(key, SP_PCA_DIM) == 0) {
+		intValue = atoi(value);
+		//number in range between 10 and 28
+		if (intValue < 10 || intValue > 28) {
+			resultValue = CFG_INVALID_ARGUMENT;
+		} else {
+			config->spPCADimension = intValue;
+		}
+	}
+	if (strcmp(key, SP_NUM_FEATURES) == 0) {
+		intValue = atoi(value);
+		//value must be positive
+		if (intValue < 0) {
+			resultValue = CFG_INVALID_ARGUMENT;
+		} else {
+			config->spNumOfFeatures = intValue;
+		}
+	}
+	if (strcmp(key, SP_NUM_SIMILAR_IMAGES) == 0) {
+		intValue = atoi(value);
+		//value must be positive
+		if (intValue < 0) {
+			resultValue = CFG_INVALID_ARGUMENT;
+		} else {
+			config->spNumOfSimilarImages = intValue;
+		}
+	}
+	if (strcmp(key, SP_KNN) == 0) {
+		intValue = atoi(value);
+		//value must be positive
+		if (intValue < 0) {
+			resultValue = CFG_INVALID_ARGUMENT;
+		} else {
+			config->spKNN = intValue;
+		}
+	}
+	if (strcmp(key, SP_LOGGER_LEVEL) == 0) {
+		intValue = atoi(value);
+		//value must be positive
+		if (intValue < 1 || intValue > 4) {
+			resultValue = CFG_INVALID_ARGUMENT;
+		} else {
+			config->spLoggerLevel = intValue;
+		}
+	}
+	if (strcmp(key, SP_MIN_GUI) == 0) {
+		//if not 'true' or 'false'
+		if (strcmp(value, "true") == 0 && strcmp(value, "false") == 0) {
+			resultValue = CFG_INVALID_ARGUMENT;
+		} else {
+			config->spMinimalGUI = strcmp(value, "true") == 0;
+		}
+	}
+	if (strcmp(key, SP_EXTRACTION_MODE) == 0) {
+		//if not 'true' or 'false'
+		if (strcmp(value, "true") == 0 && strcmp(value, "false") == 0) {
+			resultValue = CFG_INVALID_ARGUMENT;
+		} else {
+			config->spExtractionMode = strcmp(value, "true") == 0;
+		}
+	}
+	if (strcmp(key, SP_KDTREE_SPLIT_METHOD) == 0) {
+		intValue = atoi(value);
+		if (intValue != RANDOM && intValue != MAX_SPREAD
+				&& intValue != INCREMENTAL) {
+			resultValue = CFG_INVALID_ARGUMENT;
+		} else {
+			config->spKDTreeSplitMethod = intValue;
+		}
+	}
+	if (resultValue == CFG_INVALID_ARGUMENT)
+		printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
+	else if (resultValue != SUCCESS) {
+		printErrorMessage(filename, lineNumber, INVALID_CFG_LINE);
+	}
+	return resultValue;
+}
+void printErrorMessage(const char* filename, int lineNumber, char* msg) {
+	printf(ERROR_FORMAT, filename, lineNumber, msg);
 }
 char* trimSpacesFromBothSides(char* line) {
 	int l = strlen(line);
@@ -230,129 +367,43 @@ char* trimSpacesFromBothSides(char* line) {
 		--l;
 	while (*line && isspace(*line))
 		++line, --l;
-
+	//TODO - Deal with this.
 	return strndup(line, l);
-}
-int validate(char* key, char* value, int lineNumber, char* filename) {
-	int resultValue = SUCCESS;
-	int intValue = 0;
-	if (strcmp(key, SP_IMAGES_DIR) == 0) {
-		//if dir contains spaces
-		if (strchr(value, SPACE) != NULL) {
-
-		}
-	}
-	if (strcmp(key, SP_IMAGES_PREFIX) == 0) {
-		//if images prefix contains spaces
-		if (strchr(value, SPACE) != NULL) {
-			resultValue = CFG_INVALID_LINE;
-		}
-	}
-	if (strcmp(key, SP_IMAGES_SUFFIX) == 0) {
-		//suffix must be gif/bmp/jps/png
-		if (strcmp(value, BMP) == 0 && strcmp(value, JPG) == 0
-				&& strcmp(value, GIF) == 0 && strcmp(value, PNG)) {
-			resultValue = CFG_INVALID_LINE;
-		}
-	}
-	if (strcmp(key, SP_LOGGER_FILENAME) == 0) {
-		//if filename contains spaces
-		if (strchr(value, SPACE) != NULL) {
-			resultValue = CFG_INVALID_LINE;
-		}
-	}
-	if (strcmp(key, SP_PCA_FILENAME) == 0) {
-		//if filename conains spaces
-		if (strchr(value, SPACE) != NULL) {
-			resultValue = CFG_INVALID_LINE;
-		}
-	}
-	if (strcmp(key, SP_NUM_OF_IMAGES) == 0) {
-		intValue = atoi(value);
-		//value must be positive - if zero, means it is not valid.
-		if (intValue <= 0) {
-			resultValue = CFG_INVALID_LINE;
-		}
-	}
-	if (strcmp(key, SP_PCA_DIM) == 0) {
-		intValue = atoi(value);
-		//number in range between 10 and 28
-		if (intValue < 10 || intValue > 28) {
-			resultValue = CFG_INVALID_LINE;
-		}
-	}
-	if (strcmp(key, SP_NUM_FEATURES) == 0) {
-		intValue = atoi(value);
-		//value must be positive
-		if (intValue >= 0) {
-			resultValue = CFG_INVALID_LINE;
-		}
-	}
-	if (strcmp(key, SP_NUM_SIMILAR_IMAGES) == 0) {
-		intValue = atoi(value);
-		//value must be positive
-		if (intValue >= 0) {
-			resultValue = CFG_INVALID_LINE;
-		}
-	}
-	if (strcmp(key, SP_KNN) == 0) {
-		intValue = atoi(value);
-		//value must be positive
-		if (intValue >= 0) {
-			resultValue = CFG_INVALID_LINE;
-		}
-	}
-	if (strcmp(key, SP_LOGGER_LEVEL) == 0) {
-		intValue = atoi(value);
-		//value must be positive
-		if (intValue < 1 || intValue > 4) {
-			resultValue = CFG_INVALID_LINE;
-		}
-	}
-	if (strcmp(key, SP_MIN_GUI) == 0) {
-		//if not 'true' or 'false'
-		if (strcmp(value, "true") == 0 && strcmp(value, "false") == 0) {
-			resultValue = CFG_INVALID_LINE;
-		}
-	}
-	if (strcmp(key, SP_EXTRACTION_MODE) == 0) {
-		//if not 'true' or 'false'
-		if (strcmp(value, "true") == 0 && strcmp(value, "false") == 0) {
-			resultValue = CFG_INVALID_LINE;
-		}
-	}
-	if (strcmp(key, SP_KDTREE_SPLIT_METHOD) == 0) {
-		if (intValue != RANDOM && intValue != MAX_SPREAD
-				&& intValue != INCREMENTAL) {
-			resultValue = CFG_INVALID_LINE;
-		}
-	}
-	if (resultValue == CFG_INVALID_LINE)
-			printErrorMessage(filename, lineNumber, INVALID_CFG_VALUE);
-	return resultValue;
-}
-void printErrorMessage(char* filename, int lineNumber, char* msg) {
-	printf(ERROR_FORMAT, filename, lineNumber, msg);
 }
 SP_CONFIG_MSG responseCodeToConfigMessage(ResponseCode code) {
 	SP_CONFIG_MSG msg = 0;
 	switch (code) {
-	case INVALID_ARGUMENT:
-		msg = SP_CONFIG_INVALID_ARGUMENT;
-		break;
 	case ALLOCATION_FAILED:
 		msg = SP_CONFIG_ALLOC_FAIL;
 		break;
 	case SUCCESS:
 		msg = SP_CONFIG_SUCCESS;
 		break;
-	case CANNOT_OPEN_FILE:
-		msg = SP_CONFIG_CANNOT_OPEN_FILE;
-		break;
 	case CFG_INVALID_LINE:
 		msg = SP_CONFIG_INVALID_STRING;
 		break;
+	case CFG_MISSING_PREFIX:
+		break;
+	case CFG_MISSING_SUFFIX:
+		break;
+	case CFG_MISSING_NUM_IMAGES:
+		break;
+	case CFG_CANNOT_OPEN_FILE:
+		msg = SP_CONFIG_CANNOT_OPEN_FILE;
+		break;
+	case CFG_INVALID_INTEGER:
+		break;
+	case CFG_INVALID_STRING:
+		break;
+	case CFG_INVALID_ARGUMENT:
+		break;
+	case CFG_INDEX_OUT_OF_RANGE:
+		msg = SP_CONFIG_INVALID_ARGUMENT;
+		break;
+	case CFG_MISSING_DIR:
+		break;
 	}
+
 	return msg;
 }
 

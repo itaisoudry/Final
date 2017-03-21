@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 #include <ctype.h>
@@ -13,7 +14,7 @@
 /**
  * Formats
  */
-#define ERROR_FORMAT "File:%s\nLine:%d\nMessage:%s"
+#define ERROR_FORMAT "File:%s\nLine:%d\nMessage:%s\n"
 /**
  * Config Defaults
  */
@@ -60,6 +61,8 @@
 #define PNG ".png"
 
 #define NEGATIVE -1
+
+
 /**
  * A data-structure which is used for configuring the system.
  */
