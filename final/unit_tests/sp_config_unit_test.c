@@ -7,34 +7,55 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include "unit_test_util.h" //SUPPORTING MACROS ASSERT_TRUE/ASSERT_FALSE etc..
 #include "../SPConfig.h"
 void printConfig(SPConfig config);
 bool test() {
 	SPConfig config = NULL;
 	SP_CONFIG_MSG msg = SP_CONFIG_SUCCESS;
-	config = spConfigCreate("myconfig.cfg", &msg);
-	printf("%d", msg);
-	config = spConfigCreate("unit_tests/ConfigFiles/BadEnumExtractionMode.txt", &msg);
-	printf("%d", msg);
-	config = spConfigCreate("unit_tests/ConfigFiles/NoDirectory.txt", &msg);
-	printf("%d", msg);
-	config = spConfigCreate("unit_tests/ConfigFiles/NoNumberOfImages.txt", &msg);
-	printf("%d", msg);
-	config = spConfigCreate("unit_tests/ConfigFiles/NoPrefix.txt", &msg);
-	printf("%d", msg);
-	config = spConfigCreate("unit_tests/ConfigFiles/NoSuffix.txt", &msg);
-	printf("%d", msg);
-	config = spConfigCreate("unit_tests/ConfigFiles/PositiveNumberOfFeatures.txt", &msg);
-	printf("%d", msg);
+	printf("myconfig\n");
+	config = spConfigCreate("myconfig.config", &msg);
 	printConfig(config);
+
 	return true;
 }
+bool spacesTest() {
+	SPConfig config = NULL;
+	SP_CONFIG_MSG msg = SP_CONFIG_SUCCESS;
+	config = spConfigCreate("unit_tests/ConfigFiles/SpacesConfig.config", &msg);
+	printConfig(config);
+	return msg == SP_CONFIG_SUCCESS;
+}
 int main() {
-	RUN_TEST(test);
+	//RUN_TEST(test);
+	RUN_TEST(spacesTest);
 
 }
-
+bool validateConfigByValues(SPConfig config, bool spExtractionMode,
+		char* spImagesDirectory, char* spImagesPrefix, char* spImagesSuffix,
+		int spKDTreeSplitMethod, int spKNN, char* spLoggerFilename,
+		int spLoggerLevel, int spMinimalGUI, int spNumOfFeatures,
+		int spNumOfImages, int spNumOfSimilarImages, int spPCADimension,
+		char* spPCAFilename) {
+	if (config->spExtractionMode != spExtractionMode || config->spKNN != spKNN
+			|| config->spLoggerLevel != spLoggerLevel
+			|| config->spMinimalGUI != spMinimalGUI
+			|| config->spNumOfFeatures != spNumOfFeatures
+			|| config->spNumOfImages != spNumOfImages
+			|| config->spNumOfSimilarImages != spNumOfSimilarImages
+			|| config->spPCADimension != spPCADimension) {
+		return false;
+	}
+	//TODO add more constraints
+	if (strcmp(config->spImagesDirectory, spImagesDirectory) == 0
+			|| strcmp(config->spImagesPrefix, spImagesPrefix) == 0
+			|| strcmp(config->spImagesSuffix, spImagesSuffix) == 0
+			|| strcmp(config->spLoggerFilename, spLoggerFilename) == 0) {
+		return false;
+	}
+	return true;
+}
 void printConfig(SPConfig config) {
 	if (config == NULL) {
 		printf("NULL");

@@ -24,7 +24,7 @@ SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg) {
 	return config;
 	error:
 	SMART_FREE(config);
-	*msg = SP_CONFIG_INVALID_ARGUMENT;
+	*msg = responseCodeToConfigMessage(resultValue);
 	return NULL;
 }
 bool spConfigIsExtractionMode(const SPConfig config, SP_CONFIG_MSG* msg) {
@@ -169,31 +169,36 @@ int extractConfigDataFromFile(const char* filename, SPConfig config) {
 
 	file = fopen(filename, "r");
 	if (file == NULL) {
+		printf(ERROR_FILE_NOT_OPEN, filename);
 		return CFG_CANNOT_OPEN_FILE;
 	}
 	SMART_MALLOC(char*, line, LINE_LENGTH*sizeof(char));
 
 	while (fgets(line, LINE_LENGTH, file) != NULL) {
 		char* commentPtr = NULL;
-		//trim
-		line = trimSpacesFromBothSides(line);
-		//if first char is not '#'
-		if (line[0] != COMMENT && strcmp(line,EMPTY_STR)) {
+		//if first char is not '#' or new line or empty string
+		if (line[0] != COMMENT && strcmp(line, EMPTY_STR) == 0
+				&& strcmp(line, NEW_LINE) == 0) {
+
 			commentPtr = strchr(line, COMMENT);
 
 			if (commentPtr != NULL) {
 				line = strtok(line, "#");
 			}
+			//trim
+			line = trimSpacesFromBothSides(line);
 			// extract config key and value from line - if not valid, error will be printed and the program will end
 			SMART_FUNCTION_CALL(
-					extractDataFromLine(config, filename, line, lineNumber));
+			extractDataFromLine(config, filename, line, lineNumber));
 			// assign variables to config
 		}
 
 		lineNumber++;
 	}
+	fclose(file);
+	SMART_FREE(line);
 	return resultValue;
-	error:
+	error: fclose(file);
 	SMART_FREE(line);
 	return resultValue;
 
@@ -220,7 +225,8 @@ int extractDataFromLine(SPConfig config, const char* filename, char* line,
 	if (strchr(key, SPACE) != NULL) {
 		printErrorMessage(filename, lineNumber, INVALID_CFG_LINE);
 	}
-	SMART_FUNCTION_CALL(validateAndInsert(config,filename,lineNumber,key, value));
+	SMART_FUNCTION_CALL(
+			validateAndInsert(config, filename, lineNumber, key, value));
 	return resultValue;
 	error: return resultValue;
 
@@ -361,14 +367,17 @@ void printErrorMessage(const char* filename, int lineNumber, char* msg) {
 	printf(ERROR_FORMAT, filename, lineNumber, msg);
 }
 char* trimSpacesFromBothSides(char* line) {
-	int l = strlen(line);
-
-	while (isspace(line[l - 1]))
-		--l;
-	while (*line && isspace(*line))
-		++line, --l;
-	//TODO - Deal with this.
-	return strndup(line, l);
+	while (isspace((unsigned char ) *line))
+		line++;
+	if (*line) {
+		char *ptr = line;
+		while (*ptr)
+			ptr++;
+		while (isspace((unsigned char ) *(--ptr)))
+			;
+		ptr[1] = '\0';
+	}
+	return line;
 }
 SP_CONFIG_MSG responseCodeToConfigMessage(ResponseCode code) {
 	SP_CONFIG_MSG msg = 0;
