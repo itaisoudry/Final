@@ -176,27 +176,28 @@ int extractConfigDataFromFile(const char* filename, SPConfig config) {
 
 	while (fgets(line, LINE_LENGTH, file) != NULL) {
 		char* commentPtr = NULL;
+		//trim
+		line = trimSpacesFromBothSides(line);
 		//if first char is not '#' or new line or empty string
-		if (line[0] != COMMENT && strcmp(line, EMPTY_STR) == 0
-				&& strcmp(line, NEW_LINE) == 0) {
+		if (line[0] != COMMENT && strcmp(line, EMPTY_STR) != 0
+				&& strcmp(line, NEW_LINE) != 0) {
 
 			commentPtr = strchr(line, COMMENT);
 
 			if (commentPtr != NULL) {
 				line = strtok(line, "#");
 			}
-			//trim
-			line = trimSpacesFromBothSides(line);
+
 			// extract config key and value from line - if not valid, error will be printed and the program will end
 			SMART_FUNCTION_CALL(
-			extractDataFromLine(config, filename, line, lineNumber));
+					extractDataFromLine(config, filename, line, lineNumber));
 			// assign variables to config
 		}
 
 		lineNumber++;
 	}
-	fclose(file);
 	SMART_FREE(line);
+	fclose(file);
 	return resultValue;
 	error: fclose(file);
 	SMART_FREE(line);

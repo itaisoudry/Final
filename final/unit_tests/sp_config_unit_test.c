@@ -10,6 +10,12 @@
 #include <stdarg.h>
 #include "unit_test_util.h" //SUPPORTING MACROS ASSERT_TRUE/ASSERT_FALSE etc..
 #include "../SPConfig.h"
+bool validateConfigByValues(SPConfig config, bool spExtractionMode,
+		char* spImagesDirectory, char* spImagesPrefix, char* spImagesSuffix,
+		int spKDTreeSplitMethod, int spKNN, char* spLoggerFilename,
+		int spLoggerLevel, bool spMinimalGUI, int spNumOfFeatures,
+		int spNumOfImages, int spNumOfSimilarImages, int spPCADimension,
+		char* spPCAFilename);
 void printConfig(SPConfig config);
 bool test() {
 	SPConfig config = NULL;
@@ -24,7 +30,8 @@ bool spacesTest() {
 	SPConfig config = NULL;
 	SP_CONFIG_MSG msg = SP_CONFIG_SUCCESS;
 	config = spConfigCreate("unit_tests/ConfigFiles/SpacesConfig.config", &msg);
-	printConfig(config);
+	if(msg==SP_CONFIG_SUCCESS)
+		return validateConfigByValues(config,true,"./images/","img",".png",MAX_SPREAD,1,"stdout",3,false,100,2,5,20,"pca.yml");
 	return msg == SP_CONFIG_SUCCESS;
 }
 int main() {
@@ -35,7 +42,7 @@ int main() {
 bool validateConfigByValues(SPConfig config, bool spExtractionMode,
 		char* spImagesDirectory, char* spImagesPrefix, char* spImagesSuffix,
 		int spKDTreeSplitMethod, int spKNN, char* spLoggerFilename,
-		int spLoggerLevel, int spMinimalGUI, int spNumOfFeatures,
+		int spLoggerLevel, bool spMinimalGUI, int spNumOfFeatures,
 		int spNumOfImages, int spNumOfSimilarImages, int spPCADimension,
 		char* spPCAFilename) {
 	if (config->spExtractionMode != spExtractionMode || config->spKNN != spKNN
@@ -47,11 +54,10 @@ bool validateConfigByValues(SPConfig config, bool spExtractionMode,
 			|| config->spPCADimension != spPCADimension) {
 		return false;
 	}
-	//TODO add more constraints
 	if (strcmp(config->spImagesDirectory, spImagesDirectory) == 0
 			|| strcmp(config->spImagesPrefix, spImagesPrefix) == 0
 			|| strcmp(config->spImagesSuffix, spImagesSuffix) == 0
-			|| strcmp(config->spLoggerFilename, spLoggerFilename) == 0) {
+			|| strcmp(config->spLoggerFilename, spLoggerFilename) == 0 || strcmp(config->spPCAFilename,spPCAFilename)==0) {
 		return false;
 	}
 	return true;
