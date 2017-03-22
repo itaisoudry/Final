@@ -16,6 +16,7 @@
  */
 #define ERROR_FORMAT "File:%s\nLine:%d\nMessage:%s\n"
 #define ERROR_FILE_NOT_OPEN "The configuration file %s couldn’t be open\n"
+#define ERROR_MISSING_ARG "Parameter %s is not set\n"
 /**
  * Config Defaults
  */

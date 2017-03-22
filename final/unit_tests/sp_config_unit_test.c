@@ -10,12 +10,12 @@
 #include <stdarg.h>
 #include "unit_test_util.h" //SUPPORTING MACROS ASSERT_TRUE/ASSERT_FALSE etc..
 #include "../SPConfig.h"
-bool validateConfigByValues(SPConfig config, bool spExtractionMode,
-		char* spImagesDirectory, char* spImagesPrefix, char* spImagesSuffix,
-		int spKDTreeSplitMethod, int spKNN, char* spLoggerFilename,
-		int spLoggerLevel, bool spMinimalGUI, int spNumOfFeatures,
-		int spNumOfImages, int spNumOfSimilarImages, int spPCADimension,
-		char* spPCAFilename);
+bool validateConfigByValues(SPConfig config, char * spImagesDirectory,
+		char * spImagesPrefix, char* spImagesSuffix, int spNumOfImages,
+		int spPCADimension, char* spPCAFilename, int spNumOfFeatures,
+		bool spExtractionMode, int spNumOfSimilarImages,
+		SP_KDTREE_SPLIT_METHODS spKDTreeSplitMethod, int spKNN,
+		bool spMinimalGUI, int spLoggerLevel, char* spLoggerFilename);
 void printConfig(SPConfig config);
 bool test() {
 	SPConfig config = NULL;
@@ -26,25 +26,80 @@ bool test() {
 
 	return true;
 }
+bool missingDir(){
+	return false;
+}
+bool missingExtractionMode(){
+	return false;
+}
+bool missingKDTreeSplitMethod(){
+	return false;
+}
+bool missingKNN(){
+	return false;
+}
+bool missingLoggerFilename(){
+	return false;
+}
+bool missingLoggerLevel(){
+	return false;
+}
+bool missingMinimalGUI(){
+	return false;
+}
+bool missingNumImages(){
+	return false;
+}
+bool missingNumFeatures(){
+	return false;
+}
+bool missingNumSimilarImages(){
+	return false;
+}
+bool missingPCADim(){
+	return false;
+}
+bool missingPCAFilename(){
+	return false;
+}
+bool missingPrefix(){
+	return false;
+}
+bool missingSuffix(){
+	return false;
+}
+bool fullConfig() {
+	SPConfig config = NULL;
+	SP_CONFIG_MSG msg = SP_CONFIG_SUCCESS;
+	config = spConfigCreate("unit_tests/ConfigFiles/FullConfig.config", &msg);
+	if (msg == SP_CONFIG_SUCCESS) {
+		return validateConfigByValues(config, "Directory/", "img", ".png", 50,
+				15, "filename.txt", 10, true, 12, RANDOM, 10, true, 1,
+				"logger.txt");
+	}
+	return false;
+}
 bool spacesTest() {
 	SPConfig config = NULL;
 	SP_CONFIG_MSG msg = SP_CONFIG_SUCCESS;
 	config = spConfigCreate("unit_tests/ConfigFiles/SpacesConfig.config", &msg);
-	if(msg==SP_CONFIG_SUCCESS)
-		return validateConfigByValues(config,true,"./images/","img",".png",MAX_SPREAD,1,"stdout",3,false,100,2,5,20,"pca.yml");
+	if (msg == SP_CONFIG_SUCCESS)
+		return validateConfigByValues(config, "./images/", "img", ".png", 2, 20,
+				"pca.yml", 100, true, 5, DEFAULT_SP_EXTRACTION_MODE, DEFAULT_SP_KNN, DEFAULT_SP_MIN_GUI,
+				DEFAULT_SP_LOGGER_LEVEL, "stdout");
 	return msg == SP_CONFIG_SUCCESS;
 }
 int main() {
-	//RUN_TEST(test);
 	RUN_TEST(spacesTest);
+	RUN_TEST(fullConfig);
 
 }
-bool validateConfigByValues(SPConfig config, bool spExtractionMode,
-		char* spImagesDirectory, char* spImagesPrefix, char* spImagesSuffix,
-		int spKDTreeSplitMethod, int spKNN, char* spLoggerFilename,
-		int spLoggerLevel, bool spMinimalGUI, int spNumOfFeatures,
-		int spNumOfImages, int spNumOfSimilarImages, int spPCADimension,
-		char* spPCAFilename) {
+bool validateConfigByValues(SPConfig config, char * spImagesDirectory,
+		char * spImagesPrefix, char* spImagesSuffix, int spNumOfImages,
+		int spPCADimension, char* spPCAFilename, int spNumOfFeatures,
+		bool spExtractionMode, int spNumOfSimilarImages,
+		SP_KDTREE_SPLIT_METHODS spKDTreeSplitMethod, int spKNN,
+		bool spMinimalGUI, int spLoggerLevel, char* spLoggerFilename) {
 	if (config->spExtractionMode != spExtractionMode || config->spKNN != spKNN
 			|| config->spLoggerLevel != spLoggerLevel
 			|| config->spMinimalGUI != spMinimalGUI
@@ -54,10 +109,11 @@ bool validateConfigByValues(SPConfig config, bool spExtractionMode,
 			|| config->spPCADimension != spPCADimension) {
 		return false;
 	}
-	if (strcmp(config->spImagesDirectory, spImagesDirectory) == 0
-			|| strcmp(config->spImagesPrefix, spImagesPrefix) == 0
-			|| strcmp(config->spImagesSuffix, spImagesSuffix) == 0
-			|| strcmp(config->spLoggerFilename, spLoggerFilename) == 0 || strcmp(config->spPCAFilename,spPCAFilename)==0) {
+	if (strcmp(config->spImagesDirectory, spImagesDirectory) != 0
+			|| strcmp(config->spImagesPrefix, spImagesPrefix) != 0
+			|| strcmp(config->spImagesSuffix, spImagesSuffix) != 0
+			|| strcmp(config->spLoggerFilename, spLoggerFilename) != 0
+			|| strcmp(config->spPCAFilename, spPCAFilename) != 0) {
 		return false;
 	}
 	return true;

@@ -160,12 +160,28 @@ int setConfigDefaultValues(SPConfig config) {
 	return resultValue;
 
 }
-
+int validateConfig(SPConfig config,char* filename,int numberOfLines){
+	if(strcmp(config->spImagesDirectory,EMPTY_STR)==0){
+		printErrorMessage(filename,numberOfLines,)
+		return SP_CONFIG_MISSING_DIR;
+	}
+	if(strcmp(config->spImagesPrefix,EMPTY_STR)){
+		return SP_CONFIG_MISSING_PREFIX;
+	}
+	if(strcmp(config->spImagesSuffix,EMPTY_STR)){
+		return SP_CONFIG_MISSING_SUFFIX;
+	}
+	if(config->spNumOfImages<=0){
+		return SP_CONFIG_MISSING_NUM_IMAGES;
+	}
+	return SUCCESS;
+}
 int extractConfigDataFromFile(const char* filename, SPConfig config) {
 	int resultValue = SUCCESS;
 	int lineNumber = 1;
 	FILE* file = NULL;
 	char* line = NULL;
+	char* savedLinePtr = NULL;
 
 	file = fopen(filename, "r");
 	if (file == NULL) {
@@ -173,7 +189,8 @@ int extractConfigDataFromFile(const char* filename, SPConfig config) {
 		return CFG_CANNOT_OPEN_FILE;
 	}
 	SMART_MALLOC(char*, line, LINE_LENGTH*sizeof(char));
-
+	//since we are manipulating the line pointer, we need to save to original in order to free it properly
+	savedLinePtr = line;
 	while (fgets(line, LINE_LENGTH, file) != NULL) {
 		char* commentPtr = NULL;
 		//trim
@@ -196,11 +213,11 @@ int extractConfigDataFromFile(const char* filename, SPConfig config) {
 
 		lineNumber++;
 	}
-	SMART_FREE(line);
+	SMART_FREE(savedLinePtr);
 	fclose(file);
 	return resultValue;
 	error: fclose(file);
-	SMART_FREE(line);
+	SMART_FREE(savedLinePtr);
 	return resultValue;
 
 }
@@ -364,6 +381,7 @@ int validateAndInsert(SPConfig config, const char* filename, int lineNumber,
 	}
 	return resultValue;
 }
+
 void printErrorMessage(const char* filename, int lineNumber, char* msg) {
 	printf(ERROR_FORMAT, filename, lineNumber, msg);
 }
