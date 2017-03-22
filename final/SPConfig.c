@@ -161,17 +161,25 @@ int setConfigDefaultValues(SPConfig config) {
 
 }
 int validateConfig(SPConfig config,char* filename,int numberOfLines){
+	char msg[100] = "";
 	if(strcmp(config->spImagesDirectory,EMPTY_STR)==0){
-		printErrorMessage(filename,numberOfLines,)
+		sprintf(msg,ERROR_MISSING_ARG,SP_IMAGES_DIR);
+		printErrorMessage(filename,numberOfLines,msg);
 		return SP_CONFIG_MISSING_DIR;
 	}
 	if(strcmp(config->spImagesPrefix,EMPTY_STR)){
+		sprintf(msg,ERROR_MISSING_ARG,SP_IMAGES_PREFIX);
+		printErrorMessage(filename,numberOfLines,msg);
 		return SP_CONFIG_MISSING_PREFIX;
 	}
 	if(strcmp(config->spImagesSuffix,EMPTY_STR)){
+		sprintf(msg,ERROR_MISSING_ARG,SP_IMAGES_SUFFIX);
+		printErrorMessage(filename,numberOfLines,msg);
 		return SP_CONFIG_MISSING_SUFFIX;
 	}
 	if(config->spNumOfImages<=0){
+		sprintf(msg,ERROR_MISSING_ARG,SP_NUM_OF_IMAGES);
+		printErrorMessage(filename,numberOfLines,msg);
 		return SP_CONFIG_MISSING_NUM_IMAGES;
 	}
 	return SUCCESS;
@@ -213,6 +221,7 @@ int extractConfigDataFromFile(const char* filename, SPConfig config) {
 
 		lineNumber++;
 	}
+	validateConfig(config,filename,lineNumber);
 	SMART_FREE(savedLinePtr);
 	fclose(file);
 	return resultValue;
