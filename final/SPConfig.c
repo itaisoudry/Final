@@ -433,9 +433,10 @@ SP_CONFIG_MSG responseCodeToConfigMessage(ResponseCode code) {
 	case CFG_INVALID_STRING:
 		break;
 	case CFG_INVALID_ARGUMENT:
+		msg=SP_CONFIG_INVALID_ARGUMENT;
 		break;
 	case CFG_INDEX_OUT_OF_RANGE:
-		msg = SP_CONFIG_INVALID_ARGUMENT;
+		msg = SP_CONFIG_INDEX_OUT_OF_RANGE;
 		break;
 	case CFG_MISSING_DIR:
 		break;

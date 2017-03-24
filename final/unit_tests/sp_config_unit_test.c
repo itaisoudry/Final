@@ -17,17 +17,23 @@ bool validateConfigByValues(SPConfig config, char * spImagesDirectory,
 		SP_KDTREE_SPLIT_METHODS spKDTreeSplitMethod, int spKNN,
 		bool spMinimalGUI, int spLoggerLevel, char* spLoggerFilename);
 void printConfig(SPConfig config);
+SP_CONFIG_MSG message;
+SPConfig config;
 bool test() {
 	SPConfig config = NULL;
-	SP_CONFIG_MSG msg = SP_CONFIG_SUCCESS;
+	message = SP_CONFIG_SUCCESS;
 	printf("myconfig\n");
-	config = spConfigCreate("myconfig.config", &msg);
+	config = spConfigCreate("myconfig.config", &message);
 	printConfig(config);
 
 	return true;
 }
-bool missingDir(){
-	return false;
+bool directoryWithSpaces(){
+	config= spConfigCreate("unit_tests/ConfigFiles/ConstraintDirectory.config",&message);
+	ASSERT_TRUE(message==SP_CONFIG_INVALID_ARGUMENT);
+	ASSERT_TRUE(config==NULL);
+
+	return true;
 }
 bool missingExtractionMode(){
 	return false;
@@ -90,8 +96,11 @@ bool spacesTest() {
 	return msg == SP_CONFIG_SUCCESS;
 }
 int main() {
-	RUN_TEST(spacesTest);
-	RUN_TEST(fullConfig);
+//	RUN_TEST(spacesTest);
+//	RUN_TEST(fullConfig);
+	RUN_TEST(directoryWithSpaces);
+	spConfigDestroy(config);
+
 
 }
 bool validateConfigByValues(SPConfig config, char * spImagesDirectory,
