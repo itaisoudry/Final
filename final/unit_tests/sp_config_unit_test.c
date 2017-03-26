@@ -143,6 +143,86 @@ bool loggerTest() {
 	ASSERT_TRUE(config->spLoggerLevel == 3);
 	return true;
 }
+bool kdTreeSplitMethodTest() {
+	config = spConfigCreate(
+			"unit_tests/ConfigFiles/KDTreeSplitMethodWrong.config", &message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_INVALID_ARGUMENT);
+	config = spConfigCreate(
+			"unit_tests/ConfigFiles/KDTreeSplitMethodMissing.config", &message);
+	ASSERT_FALSE(config==NULL);
+	ASSERT_TRUE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(config->spKDTreeSplitMethod == MAX_SPREAD);
+	return true;
+}
+bool knnTest() {
+	config = spConfigCreate("unit_tests/ConfigFiles/KNNWrong.config", &message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	config = spConfigCreate("unit_tests/ConfigFiles/KNNMissing.config",
+			&message);
+	ASSERT_FALSE(config==NULL);
+	ASSERT_TRUE(message == SP_CONFIG_SUCCESS);
+	//default value
+	ASSERT_TRUE(config->spKNN == 1);
+	return true;
+}
+bool minimalGuiTest() {
+	config = spConfigCreate("unit_tests/ConfigFiles/MinimalGUIWrong.config",
+			&message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_INVALID_ARGUMENT);
+	config = spConfigCreate("unit_tests/ConfigFiles/MinimalGUIMissing.config",
+			&message);
+	ASSERT_FALSE(config==NULL);
+	ASSERT_TRUE(message = SP_CONFIG_SUCCESS);
+	//default value
+	ASSERT_TRUE(config->spMinimalGUI==false);
+	return true;
+}
+bool numOfFeaturesTest() {
+	config = spConfigCreate("unit_tests/ConfigFiles/NumOfFeaturesWrong.config",
+			&message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_INVALID_ARGUMENT);
+	config = spConfigCreate("unit_tests/ConfigFiles/NumOfFeaturesMissing.config",
+			&message);
+	ASSERT_FALSE(config==NULL);
+	ASSERT_TRUE(message = SP_CONFIG_SUCCESS);
+	//default value
+	ASSERT_TRUE(config->spNumOfFeatures==100);
+	return true;
+}
+bool numOfImagesTest() {
+	config = spConfigCreate("unit_tests/ConfigFiles/NumImagesWrong.config",
+			&message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_INVALID_ARGUMENT);
+	config = spConfigCreate("unit_tests/ConfigFiles/NumImagesMissing.config",
+			&message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_MISSING_NUM_IMAGES);
+	return true;
+}
+bool numOfSimilarImagesTest() {
+	config = spConfigCreate("unit_tests/ConfigFiles/NumOfSimilarImagesWrong.config",
+				&message);
+		ASSERT_TRUE(config==NULL);
+		ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+		ASSERT_TRUE(message == SP_CONFIG_INVALID_ARGUMENT);
+		config = spConfigCreate("unit_tests/ConfigFiles/NumOfSimilarImagesMissing.config",
+				&message);
+		ASSERT_FALSE(config==NULL);
+		ASSERT_TRUE(message = SP_CONFIG_SUCCESS);
+		//default value
+		ASSERT_TRUE(config->spNumOfSimilarImages==1);
+	return true;
+}
 bool spacesTest() {
 	config = spConfigCreate("unit_tests/ConfigFiles/SpacesConfig.config",
 			&message);
@@ -154,14 +234,20 @@ bool spacesTest() {
 	return message == SP_CONFIG_SUCCESS;
 }
 int main() {
-//	RUN_TEST(spacesTest);
-//	RUN_TEST(fullConfig);
-//	RUN_TEST(directoryTest);
-//	RUN_TEST(prefixTest);
-//	RUN_TEST(suffixTest);
-//	RUN_TEST(extractionModeTest);
-//	RUN_TEST(pcaTest);
+	RUN_TEST(spacesTest);
+	//TODO= CHEKC FULL CONFIG it fails..
+	RUN_TEST(fullConfig);
+	RUN_TEST(directoryTest);
+	RUN_TEST(prefixTest);
+	RUN_TEST(suffixTest);
+	RUN_TEST(extractionModeTest);
+	RUN_TEST(pcaTest);
 	RUN_TEST(loggerTest);
+	RUN_TEST(kdTreeSplitMethodTest);
+	RUN_TEST(knnTest);
+	RUN_TEST(minimalGuiTest);
+	RUN_TEST(numOfFeaturesTest);
+	RUN_TEST(numOfSimilarImagesTest);
 	spConfigDestroy(config);
 	return 0;
 	//TODO - combine tests - i.e dir test which include a test for space and a test for missing dir

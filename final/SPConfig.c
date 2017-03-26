@@ -326,7 +326,7 @@ int validateAndInsert(SPConfig config, const char* filename, int lineNumber,
 	if (strcmp(key, SP_NUM_FEATURES) == 0) {
 		intValue = atoi(value);
 		//value must be positive
-		if (intValue < 0) {
+		if (intValue <= 0) {
 			resultValue = CFG_INVALID_ARGUMENT;
 		} else {
 			config->spNumOfFeatures = intValue;
@@ -335,7 +335,7 @@ int validateAndInsert(SPConfig config, const char* filename, int lineNumber,
 	if (strcmp(key, SP_NUM_SIMILAR_IMAGES) == 0) {
 		intValue = atoi(value);
 		//value must be positive
-		if (intValue < 0) {
+		if (intValue <= 0) {
 			resultValue = CFG_INVALID_ARGUMENT;
 		} else {
 			config->spNumOfSimilarImages = intValue;
@@ -344,7 +344,7 @@ int validateAndInsert(SPConfig config, const char* filename, int lineNumber,
 	if (strcmp(key, SP_KNN) == 0) {
 		intValue = atoi(value);
 		//value must be positive
-		if (intValue < 0) {
+		if (intValue <= 0) {
 			resultValue = CFG_INVALID_ARGUMENT;
 		} else {
 			config->spKNN = intValue;
