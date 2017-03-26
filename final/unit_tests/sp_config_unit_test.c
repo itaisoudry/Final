@@ -20,7 +20,6 @@ void printConfig(SPConfig config);
 SP_CONFIG_MSG message;
 SPConfig config;
 bool test() {
-	SPConfig config = NULL;
 	message = SP_CONFIG_SUCCESS;
 	printf("myconfig\n");
 	config = spConfigCreate("myconfig.config", &message);
@@ -28,79 +27,144 @@ bool test() {
 
 	return true;
 }
-bool directoryWithSpaces(){
-	config= spConfigCreate("unit_tests/ConfigFiles/ConstraintDirectory.config",&message);
-	ASSERT_TRUE(message==SP_CONFIG_INVALID_ARGUMENT);
-	ASSERT_TRUE(config==NULL);
-
-	return true;
-}
-bool missingExtractionMode(){
-	return false;
-}
-bool missingKDTreeSplitMethod(){
-	return false;
-}
-bool missingKNN(){
-	return false;
-}
-bool missingLoggerFilename(){
-	return false;
-}
-bool missingLoggerLevel(){
-	return false;
-}
-bool missingMinimalGUI(){
-	return false;
-}
-bool missingNumImages(){
-	return false;
-}
-bool missingNumFeatures(){
-	return false;
-}
-bool missingNumSimilarImages(){
-	return false;
-}
-bool missingPCADim(){
-	return false;
-}
-bool missingPCAFilename(){
-	return false;
-}
-bool missingPrefix(){
-	return false;
-}
-bool missingSuffix(){
-	return false;
-}
 bool fullConfig() {
-	SPConfig config = NULL;
-	SP_CONFIG_MSG msg = SP_CONFIG_SUCCESS;
-	config = spConfigCreate("unit_tests/ConfigFiles/FullConfig.config", &msg);
-	if (msg == SP_CONFIG_SUCCESS) {
+	config = spConfigCreate("unit_tests/ConfigFiles/FullConfig.config",
+			&message);
+	if (message == SP_CONFIG_SUCCESS) {
 		return validateConfigByValues(config, "Directory/", "img", ".png", 50,
 				15, "filename.txt", 10, true, 12, RANDOM, 10, true, 1,
 				"logger.txt");
 	}
 	return false;
 }
+bool directoryTest() {
+	config = spConfigCreate("unit_tests/ConfigFiles/DirectoryWithSpace.config",
+			&message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_INVALID_ARGUMENT);
+	config = spConfigCreate("unit_tests/ConfigFiles/DirectoryMissing.config",
+			&message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_MISSING_DIR);
+	return true;
+}
+bool prefixTest() {
+	config = spConfigCreate("unit_tests/ConfigFiles/PrefixWithSpace.config",
+			&message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_INVALID_ARGUMENT);
+	config = spConfigCreate("unit_tests/ConfigFiles/PrefixMissing.config",
+			&message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_MISSING_PREFIX);
+	return true;
+}
+bool suffixTest() {
+	config = spConfigCreate("unit_tests/ConfigFiles/SuffixWrong.config",
+			&message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_INVALID_ARGUMENT);
+	config = spConfigCreate("unit_tests/ConfigFiles/SuffixMissing.config",
+			&message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_MISSING_SUFFIX);
+	return true;
+}
+bool extractionModeTest() {
+	config = spConfigCreate("unit_tests/ConfigFiles/ExtractionModeWrong.config",
+			&message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_INVALID_ARGUMENT);
+	config = spConfigCreate(
+			"unit_tests/ConfigFiles/ExtractionModeMissing.config", &message);
+	ASSERT_FALSE(config==NULL);
+	ASSERT_TRUE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(spConfigIsExtractionMode(config,&message)==true);
+	ASSERT_TRUE(message == SP_CONFIG_SUCCESS);
+	return true;
+
+}
+bool pcaTest() {
+	config = spConfigCreate("unit_tests/ConfigFiles/PCADimWrong.config",
+			&message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_INVALID_ARGUMENT);
+	config = spConfigCreate("unit_tests/ConfigFiles/PCADimMissing.config",
+			&message);
+	ASSERT_FALSE(config==NULL);
+	ASSERT_TRUE(message == SP_CONFIG_SUCCESS);
+	//default value
+	ASSERT_TRUE(spConfigGetPCADim(config, &message) == 20);
+
+	config = spConfigCreate("unit_tests/ConfigFiles/PCAFilenameSpace.config",
+			&message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_INVALID_ARGUMENT);
+	config = spConfigCreate("unit_tests/ConfigFiles/PCAFilenameMissing.config",
+			&message);
+	ASSERT_FALSE(config==NULL);
+	ASSERT_TRUE(message == SP_CONFIG_SUCCESS);
+	//default value
+	ASSERT_TRUE(strcmp(config->spPCAFilename, "pca.yml") == 0);
+	return true;
+}
+bool loggerTest() {
+	config = spConfigCreate("unit_tests/ConfigFiles/LoggerFilenameSpace.config",
+			&message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_INVALID_ARGUMENT);
+	config = spConfigCreate(
+			"unit_tests/ConfigFiles/LoggerFilenameMissing.config", &message);
+	ASSERT_FALSE(config==NULL);
+	ASSERT_TRUE(message == SP_CONFIG_SUCCESS);
+
+	//default value
+	ASSERT_TRUE(strcmp(config->spLoggerFilename, "stdout") == 0);
+	config = spConfigCreate("unit_tests/ConfigFiles/LoggerLevelWrong.config",
+			&message);
+	ASSERT_TRUE(config==NULL);
+	ASSERT_FALSE(message == SP_CONFIG_SUCCESS);
+	ASSERT_TRUE(message == SP_CONFIG_INVALID_ARGUMENT);
+	config = spConfigCreate("unit_tests/ConfigFiles/LoggerLevelMissing.config",
+			&message);
+	ASSERT_FALSE(config==NULL);
+	ASSERT_TRUE(message == SP_CONFIG_SUCCESS);
+	//default value
+	ASSERT_TRUE(config->spLoggerLevel == 3);
+	return true;
+}
 bool spacesTest() {
-	SPConfig config = NULL;
-	SP_CONFIG_MSG msg = SP_CONFIG_SUCCESS;
-	config = spConfigCreate("unit_tests/ConfigFiles/SpacesConfig.config", &msg);
-	if (msg == SP_CONFIG_SUCCESS)
+	config = spConfigCreate("unit_tests/ConfigFiles/SpacesConfig.config",
+			&message);
+	if (message == SP_CONFIG_SUCCESS)
 		return validateConfigByValues(config, "./images/", "img", ".png", 2, 20,
-				"pca.yml", 100, true, 5, DEFAULT_SP_EXTRACTION_MODE, DEFAULT_SP_KNN, DEFAULT_SP_MIN_GUI,
+				"pca.yml", 100, true, 5, DEFAULT_SP_EXTRACTION_MODE,
+				DEFAULT_SP_KNN, DEFAULT_SP_MIN_GUI,
 				DEFAULT_SP_LOGGER_LEVEL, "stdout");
-	return msg == SP_CONFIG_SUCCESS;
+	return message == SP_CONFIG_SUCCESS;
 }
 int main() {
 //	RUN_TEST(spacesTest);
 //	RUN_TEST(fullConfig);
-	RUN_TEST(directoryWithSpaces);
+//	RUN_TEST(directoryTest);
+//	RUN_TEST(prefixTest);
+//	RUN_TEST(suffixTest);
+//	RUN_TEST(extractionModeTest);
+//	RUN_TEST(pcaTest);
+	RUN_TEST(loggerTest);
 	spConfigDestroy(config);
-
+	return 0;
+	//TODO - combine tests - i.e dir test which include a test for space and a test for missing dir
 
 }
 bool validateConfigByValues(SPConfig config, char * spImagesDirectory,

@@ -21,6 +21,7 @@ SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg) {
 	SMART_MALLOC(SPConfig, config, sizeof(*config));
 	SMART_FUNCTION_CALL(setConfigDefaultValues(config));
 	SMART_FUNCTION_CALL(extractConfigDataFromFile(filename, config));
+	*msg = responseCodeToConfigMessage(resultValue);
 	return config;
 	error:
 	SMART_FREE(config);
@@ -160,27 +161,27 @@ int setConfigDefaultValues(SPConfig config) {
 	return resultValue;
 
 }
-int validateConfig(SPConfig config,char* filename,int numberOfLines){
+int validateConfig(SPConfig config, const char* filename, int numberOfLines) {
 	char msg[100] = "";
-	if(strcmp(config->spImagesDirectory,EMPTY_STR)==0){
-		sprintf(msg,ERROR_MISSING_ARG,SP_IMAGES_DIR);
-		printErrorMessage(filename,numberOfLines,msg);
-		return SP_CONFIG_MISSING_DIR;
+	if (strcmp(config->spImagesDirectory, EMPTY_STR) == 0) {
+		sprintf(msg, ERROR_MISSING_ARG, SP_IMAGES_DIR);
+		printErrorMessage(filename, numberOfLines, msg);
+		return CFG_MISSING_DIR;
 	}
-	if(strcmp(config->spImagesPrefix,EMPTY_STR)){
-		sprintf(msg,ERROR_MISSING_ARG,SP_IMAGES_PREFIX);
-		printErrorMessage(filename,numberOfLines,msg);
-		return SP_CONFIG_MISSING_PREFIX;
+	if (strcmp(config->spImagesPrefix, EMPTY_STR)==0) {
+		sprintf(msg, ERROR_MISSING_ARG, SP_IMAGES_PREFIX);
+		printErrorMessage(filename, numberOfLines, msg);
+		return CFG_MISSING_PREFIX;
 	}
-	if(strcmp(config->spImagesSuffix,EMPTY_STR)){
-		sprintf(msg,ERROR_MISSING_ARG,SP_IMAGES_SUFFIX);
-		printErrorMessage(filename,numberOfLines,msg);
-		return SP_CONFIG_MISSING_SUFFIX;
+	if (strcmp(config->spImagesSuffix, EMPTY_STR)==0) {
+		sprintf(msg, ERROR_MISSING_ARG, SP_IMAGES_SUFFIX);
+		printErrorMessage(filename, numberOfLines, msg);
+		return CFG_MISSING_SUFFIX;
 	}
-	if(config->spNumOfImages<=0){
-		sprintf(msg,ERROR_MISSING_ARG,SP_NUM_OF_IMAGES);
-		printErrorMessage(filename,numberOfLines,msg);
-		return SP_CONFIG_MISSING_NUM_IMAGES;
+	if (config->spNumOfImages <= 0) {
+		sprintf(msg, ERROR_MISSING_ARG, SP_NUM_OF_IMAGES);
+		printErrorMessage(filename, numberOfLines, msg);
+		return CFG_MISSING_NUM_IMAGES;
 	}
 	return SUCCESS;
 }
@@ -221,7 +222,7 @@ int extractConfigDataFromFile(const char* filename, SPConfig config) {
 
 		lineNumber++;
 	}
-	validateConfig(config,filename,lineNumber);
+	resultValue = validateConfig(config, filename, lineNumber);
 	SMART_FREE(savedLinePtr);
 	fclose(file);
 	return resultValue;
@@ -281,8 +282,8 @@ int validateAndInsert(SPConfig config, const char* filename, int lineNumber,
 	}
 	if (strcmp(key, SP_IMAGES_SUFFIX) == 0) {
 		//suffix must be gif/bmp/jps/png
-		if (strcmp(value, BMP) == 0 && strcmp(value, JPG) == 0
-				&& strcmp(value, GIF) == 0 && strcmp(value, PNG)) {
+		if (strcmp(value, BMP) != 0 && strcmp(value, JPG) != 0
+				&& strcmp(value, GIF) != 0 && strcmp(value, PNG)) {
 			resultValue = CFG_INVALID_ARGUMENT;
 		} else {
 			strcpy(config->spImagesSuffix, value);
@@ -360,7 +361,7 @@ int validateAndInsert(SPConfig config, const char* filename, int lineNumber,
 	}
 	if (strcmp(key, SP_MIN_GUI) == 0) {
 		//if not 'true' or 'false'
-		if (strcmp(value, "true") == 0 && strcmp(value, "false") == 0) {
+		if (strcmp(value, "true") != 0 && strcmp(value, "false") != 0) {
 			resultValue = CFG_INVALID_ARGUMENT;
 		} else {
 			config->spMinimalGUI = strcmp(value, "true") == 0;
@@ -368,7 +369,7 @@ int validateAndInsert(SPConfig config, const char* filename, int lineNumber,
 	}
 	if (strcmp(key, SP_EXTRACTION_MODE) == 0) {
 		//if not 'true' or 'false'
-		if (strcmp(value, "true") == 0 && strcmp(value, "false") == 0) {
+		if (strcmp(value, "true") != 0 && strcmp(value, "false") != 0) {
 			resultValue = CFG_INVALID_ARGUMENT;
 		} else {
 			config->spExtractionMode = strcmp(value, "true") == 0;
@@ -420,25 +421,31 @@ SP_CONFIG_MSG responseCodeToConfigMessage(ResponseCode code) {
 		msg = SP_CONFIG_INVALID_STRING;
 		break;
 	case CFG_MISSING_PREFIX:
+		msg = SP_CONFIG_MISSING_PREFIX;
 		break;
 	case CFG_MISSING_SUFFIX:
+		msg = SP_CONFIG_MISSING_SUFFIX;
 		break;
 	case CFG_MISSING_NUM_IMAGES:
+		msg = SP_CONFIG_MISSING_NUM_IMAGES;
 		break;
 	case CFG_CANNOT_OPEN_FILE:
 		msg = SP_CONFIG_CANNOT_OPEN_FILE;
 		break;
 	case CFG_INVALID_INTEGER:
+		msg = SP_CONFIG_INVALID_INTEGER;
 		break;
 	case CFG_INVALID_STRING:
+		msg = SP_CONFIG_INVALID_STRING;
 		break;
 	case CFG_INVALID_ARGUMENT:
-		msg=SP_CONFIG_INVALID_ARGUMENT;
+		msg = SP_CONFIG_INVALID_ARGUMENT;
 		break;
 	case CFG_INDEX_OUT_OF_RANGE:
 		msg = SP_CONFIG_INDEX_OUT_OF_RANGE;
 		break;
 	case CFG_MISSING_DIR:
+		msg = SP_CONFIG_MISSING_DIR;
 		break;
 	}
 
