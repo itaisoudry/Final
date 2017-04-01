@@ -40,6 +40,7 @@ void spLoggerDestroy() {
 		fclose(logger->outputChannel);
 	}
 	free(logger); //free allocation
+	logger = NULL; //reset logger global pointer to null
 }
 //since errors are always printed there is no need to validate the logger level
 SP_LOGGER_MSG spLoggerPrintError(const char* msg, const char* file,
@@ -66,13 +67,11 @@ SP_LOGGER_MSG spLoggerPrintWarning(const char* msg, const char* file,
 		return SP_LOGGER_INVAlID_ARGUMENT;
 	}
 	//validate logger level
-	if (logger->level == SP_LOGGER_ERROR_LEVEL
-			|| logger->level == SP_LOGGER_WARNING_ERROR_LEVEL
-			|| logger->level == SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) {
+	if (logger->level == SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) {
 		if (logger->isStdOut == true) {
 			printf(LOGGER_FORMAT, WARNING_TITLE, file, function, line, msg);
 		} else {
-			if (fprintf(logger->outputChannel, LOGGER_FORMAT, ERROR_TITLE, file,
+			if (fprintf(logger->outputChannel, LOGGER_FORMAT, WARNING_TITLE, file,
 					function, line, msg) < 0)
 				return SP_LOGGER_WRITE_FAIL;
 		}
@@ -85,8 +84,7 @@ SP_LOGGER_MSG spLoggerPrintInfo(const char* msg) {
 	if (msg == NULL) {
 		return SP_LOGGER_INVAlID_ARGUMENT;
 	}
-	if (logger->level == SP_LOGGER_INFO_WARNING_ERROR_LEVEL
-			|| logger->level == SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) {
+	if (logger->level == SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) {
 		if (logger->isStdOut == true) {
 			printf(LOGGER_INFO_FORMAT, msg);
 		} else {
@@ -108,7 +106,7 @@ SP_LOGGER_MSG spLoggerPrintDebug(const char* msg, const char* file,
 		if (logger->isStdOut == true) {
 			printf(LOGGER_FORMAT, DEBUG_TITLE, file, function, line, msg);
 		} else {
-			if (fprintf(logger->outputChannel, LOGGER_FORMAT, ERROR_TITLE, file,
+			if (fprintf(logger->outputChannel, LOGGER_FORMAT, DEBUG_TITLE, file,
 					function, line, msg) < 0)
 				return SP_LOGGER_WRITE_FAIL;
 		}
