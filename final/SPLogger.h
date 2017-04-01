@@ -23,15 +23,22 @@
  * spLoggerPrintDebug   - Prints debug messages at level {Debug}
  * spLoggerPrintMsg     - Prints the exact message at any level (Without formatting)
  */
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+//File open mode
+#define SP_LOGGER_OPEN_MODE "w"
+
 /**Titles**/
 #define ERROR_TITLE "---ERROR---"
 #define WARNING_TITLE "---WARNING---"
 #define DEBUG_TITLE "---DEBUG---"
-#define FILE_TITLE "-file"
-#define LINE_TITLE "-line"
-#define FUNCTION_TITLE "-function"
-#define MESSAGE_TITLE "-message"
-/** A type used to decide the level of the logger**/
+#define LOGGER_FORMAT "%s\n- file: %s\n- function: %s\n- line: %d\n- message: %s\n"
+#define LOGGER_INFO_FORMAT "---INFO---\n- message: %s\n"
+#define LOGGER_MSG_FORMAT "%s\n"
+#define STDOUT "stdout"
+	/** A type used to decide the level of the logger**/
 typedef enum sp_logger_level_t {
 	SP_LOGGER_ERROR_LEVEL, //Error level
 	SP_LOGGER_WARNING_ERROR_LEVEL, //Warning level
@@ -82,7 +89,7 @@ void spLoggerDestroy();
  * 	- file: <file>
  *  - function: <function>
  *  - line: <line>
- *  - message: <msg>
+ *  - message: <msg>LOGGER_INFO_FORMAT
  *
  * 	<file> 	   - is the string given by file, it represents the file in which
  * 		   		 the error print call occurred.

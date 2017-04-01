@@ -233,7 +233,7 @@ bool spacesTest() {
 				DEFAULT_SP_LOGGER_LEVEL, "stdout");
 	return message == SP_CONFIG_SUCCESS;
 }
-int main() {
+int main1() {
 	RUN_TEST(spacesTest);
 	//TODO= CHEKC FULL CONFIG it fails..
 	RUN_TEST(fullConfig);
