@@ -1,0 +1,10 @@
+---ERROR---
+- file: sp_logger_unit_test.c
+- function: basicLoggerErrorTest
+- line: 50
+- message: MSGA
+---ERROR---
+- file: sp_logger_unit_test.c
+- function: basicLoggerErrorTest
+- line: 51
+- message: MSGB
