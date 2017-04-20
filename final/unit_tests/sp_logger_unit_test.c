@@ -99,6 +99,7 @@ static bool loggerStdoutTest() {
 	return true;
 }
 int main() {
+
 	RUN_TEST(basicLoggerTest);
 	RUN_TEST(basicLoggerErrorTest);
 	RUN_TEST(basicLoggerDebugTest);
