@@ -14,6 +14,9 @@
 #include <string.h>
 #include "SPPoint.h"
 #include "KDArray.h"
+#include "Utils/AllocationHandler.h"
+#include "Utils/ResponseCodes.h"
+
 #define RANDOM 0
 #define INCREMENTAL 1
 #define MAX_SPREAD 2

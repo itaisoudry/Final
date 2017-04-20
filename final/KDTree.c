@@ -12,8 +12,7 @@
 #define LEFT 0
 #define RIGHT 1
 
-
-struct KD_Tree_NODE{
+struct KD_Tree_NODE {
 	int dim;
 	double val;
 	struct KD_Tree_NODE* left;
@@ -21,11 +20,12 @@ struct KD_Tree_NODE{
 	SPKDArray data;
 };
 
-void PrintTree (KDTreeNode root){
+void PrintTree(KDTreeNode root) {
 
 }
 
-KDTreeNode NodeInit(int dim, double val, KDTreeNode left, KDTreeNode right, SPKDArray data) {
+KDTreeNode NodeInit(int dim, double val, KDTreeNode left, KDTreeNode right,
+		SPKDArray data) {
 	KDTreeNode node = (KDTreeNode) malloc(sizeof(KDTreeNode));
 	if (node == NULL)
 		return NULL;
@@ -40,18 +40,21 @@ KDTreeNode NodeInit(int dim, double val, KDTreeNode left, KDTreeNode right, SPKD
 KDTreeNode KDTreeInit(SPPoint** p, int n, int d, int splitMethod) {
 	SPKDArray array;
 	SPKDArray* kdarr = init(p, n);
+
 	if (kdarr == NULL || kdarr < 0) {
 		return NULL;
 	}
+
 	return KDTreeBuild(array, splitMethod, -1);
 }
 int maxSpread(SPKDArray kdarray) {
 	int i, j = 0;
 	double min, max;
-	double maxS=0;
+	double maxS = 0;
+
 	for (i = 0; i < kdarray.d; i++) {
 		min = spPointGetAxisCoor((kdarray.arr[kdarray.mat[i][0]]), i);
-		max = spPointGetAxisCoor(kdarray.arr[kdarray.mat[i][kdarray.n - 1]],i);
+		max = spPointGetAxisCoor(kdarray.arr[kdarray.mat[i][kdarray.n - 1]], i);
 		if ((max - min) > maxS) {
 			maxS = max - min;
 			j = i;
@@ -77,22 +80,20 @@ int maxSpread(SPKDArray kdarray) {
 			isplit = rand() % d;
 		} else if (splitMethod == INCREMENTAL) {
 			isplit = (iSplit + 1) % d;
-		}
-		else if (splitMethod==MAX_SPREAD){
-			isplit =maxSpread(kdarr);
+		} else if (splitMethod == MAX_SPREAD) {
+			isplit = maxSpread(kdarr);
 
-		}
-		else{
+		} else {
 			return NULL;
 
 		}
 		val = spPointGetAxisCoor(kdarr.arr[idx], isplit);
 		idx = kdarr.mat[isplit][mid];
-		if(n%2==0){
-				mid = n/2;
-			}
-			else{
-				mid =(n+1)/2;}
+		if (n % 2 == 0) {
+			mid = n / 2;
+		} else {
+			mid = (n + 1) / 2;
+		}
 
 		if (Split(&kdarr, isplit, &leftArr, &rightArr) < 0) {
 			return NULL;
@@ -101,28 +102,26 @@ int maxSpread(SPKDArray kdarray) {
 		left = KDTreeBuild(leftArr, splitMethod, isplit);
 		right = KDTreeBuild(rightArr, splitMethod, isplit);
 
-		if (!left || !right){
-			return NULL;}
+		if (!left || !right) {
+			return NULL;
+		}
 		return NodeInit(isplit, val, left, right, NULL);
 	}
 
-
 	int searchUtil(KDTreeNode curr, SPBPQueue bpq, SPPoint* p) {
-
-		BPQueueElement out = (BPQueueElement) malloc (sizeof(int)+sizeof(double))  ; //represents output point
-		if(!out){
-			return -1; //smart malloc needed! :)
-		}
-		double l2dist,bpqMax;
-
+		int resultValue = 0;
+		BPQueueElement* out;
+		double l2dist, bpqMax;
 		char side;
 
 		if (!curr)
 			return -1;
 
+		SMART_MALLOC(BPQueueElement, out, sizeof(BPQueueElement)); //represents output point
+
 		if (isLeaf(curr)) {
-			out ->index = spPointGetIndex(curr->data->arr[0]);
-			out-> value =	spPointL2SquaredDistance(curr->data->arr[0], *p);
+			out.index = spPointGetIndex(curr->data.arr[0]-);
+			out.value = spPointL2SquaredDistance(curr->data.arr[0], p);
 			if (!out) {
 				//TODO free the malloc
 				return -1;
@@ -130,7 +129,7 @@ int maxSpread(SPKDArray kdarray) {
 			}
 			//we try to insert it to the bpq
 			int insert = spBPQueueEnqueue(bpq, out);
-			if ( insert!= SP_BPQUEUE_SUCCESS) {
+			if (insert != SP_BPQUEUE_SUCCESS) {
 				//TODO free the malloc
 				return -1;
 			}
@@ -156,31 +155,41 @@ int maxSpread(SPKDArray kdarray) {
 			}
 		}
 		return 0;
+
+		error:
+		SMART_FREE(out);
+
+		//TODO - switch to return value
+		return NULL;
 	}
 
 	int* SPKDTreeSearch(KDTreeNode root, int SPKNN, SPPoint* p) {
+		int resultValue = SUCCESS;
+		BPQueueElement* curr = NULL;
+		SPBPQueue bpq = NULL;
 
-		BPQueueElement curr = (BPQueueElement) malloc(sizeof(BPQueueElement)) ;
-		SPBPQueue bpq;
-		if (root==NULL || SPKNN < 1)
+		SMART_MALLOC(BPQueueElement*, curr, sizeof(BPQueueElement));
+//		BPQueueElement curr = (BPQueueElement) malloc(sizeof(BPQueueElement));
+
+		if (root == NULL || SPKNN < 1)
 			return NULL;
+
 		bpq = spBPQueueCreate(SPKNN);
 		if (searchUtil(root, bpq, p) < 0) {
 			return NULL;
 		}
-		int* res =(int*) malloc(sizeof(int) * SPKNN);
-
+		int* res = (int*) malloc(sizeof(int) * SPKNN);
 
 		for (i = 0; i < SPKNN; i++) {
 			curr = spBPQueuePeek(bpq);
-			if (curr==NULL||spBPQueueDequeue(bpq) != SP_BPQUEUE_SUCCESS)
+			if (curr == NULL || (spBPQueueDequeue(bpq) != SP_BPQUEUE_SUCCESS))
 				return NULL;
 			res[i] = curr->index;
 		}
 
 		return res;
+		error:
+			SMART_FREE(curr);
 	}
-
-
 
 }
