@@ -40,10 +40,10 @@ void spLoggerDestroy() {
 		fclose(logger->outputChannel);
 	}
 	free(logger); //free allocation
+	logger = NULL; //reset logger global pointer to null
 }
 //since errors are always printed there is no need to validate the logger level
-SP_LOGGER_MSG spLoggerPrintError(const char* msg, const char* file,
-		const char* function, const int line) {
+SP_LOGGER_MSG spLoggerPrintError(const char* msg, const char* file, const char* function, const int line) {
 	if (logger == NULL)
 		return SP_LOGGER_UNDIFINED;
 	if (msg == NULL || file == NULL || function == NULL || line < 0) {
@@ -52,28 +52,24 @@ SP_LOGGER_MSG spLoggerPrintError(const char* msg, const char* file,
 	if (logger->isStdOut == true) {
 		printf(LOGGER_FORMAT, ERROR_TITLE, file, function, line, msg);
 	} else {
-		if (fprintf(logger->outputChannel, LOGGER_FORMAT, ERROR_TITLE, file,
-				function, line, msg) < 0)
+		if (fprintf(logger->outputChannel, LOGGER_FORMAT, ERROR_TITLE, file, function, line, msg) < 0)
 			return SP_LOGGER_WRITE_FAIL;
 	}
 	return SP_LOGGER_SUCCESS;
 }
-SP_LOGGER_MSG spLoggerPrintWarning(const char* msg, const char* file,
-		const char* function, const int line) {
+SP_LOGGER_MSG spLoggerPrintWarning(const char* msg, const char* file, const char* function, const int line) {
 	if (logger == NULL)
 		return SP_LOGGER_UNDIFINED;
 	if (msg == NULL || file == NULL || function == NULL || line < 0) {
 		return SP_LOGGER_INVAlID_ARGUMENT;
 	}
 	//validate logger level
-	if (logger->level == SP_LOGGER_ERROR_LEVEL
-			|| logger->level == SP_LOGGER_WARNING_ERROR_LEVEL
+	if (logger->level == SP_LOGGER_WARNING_ERROR_LEVEL || logger->level == SP_LOGGER_INFO_WARNING_ERROR_LEVEL
 			|| logger->level == SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) {
 		if (logger->isStdOut == true) {
 			printf(LOGGER_FORMAT, WARNING_TITLE, file, function, line, msg);
 		} else {
-			if (fprintf(logger->outputChannel, LOGGER_FORMAT, ERROR_TITLE, file,
-					function, line, msg) < 0)
+			if (fprintf(logger->outputChannel, LOGGER_FORMAT, WARNING_TITLE, file, function, line, msg) < 0)
 				return SP_LOGGER_WRITE_FAIL;
 		}
 	}
@@ -96,8 +92,7 @@ SP_LOGGER_MSG spLoggerPrintInfo(const char* msg) {
 	}
 	return SP_LOGGER_SUCCESS;
 }
-SP_LOGGER_MSG spLoggerPrintDebug(const char* msg, const char* file,
-		const char* function, const int line) {
+SP_LOGGER_MSG spLoggerPrintDebug(const char* msg, const char* file, const char* function, const int line) {
 	if (logger == NULL)
 		return SP_LOGGER_UNDIFINED;
 	if (msg == NULL || file == NULL || function == NULL || line < 0) {
@@ -108,8 +103,7 @@ SP_LOGGER_MSG spLoggerPrintDebug(const char* msg, const char* file,
 		if (logger->isStdOut == true) {
 			printf(LOGGER_FORMAT, DEBUG_TITLE, file, function, line, msg);
 		} else {
-			if (fprintf(logger->outputChannel, LOGGER_FORMAT, ERROR_TITLE, file,
-					function, line, msg) < 0)
+			if (fprintf(logger->outputChannel, LOGGER_FORMAT, DEBUG_TITLE, file, function, line, msg) < 0)
 				return SP_LOGGER_WRITE_FAIL;
 		}
 	}

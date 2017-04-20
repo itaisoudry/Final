@@ -28,7 +28,7 @@
 #include <stdbool.h>
 
 //File open mode
-#define SP_LOGGER_OPEN_MODE "w"
+#define SP_LOGGER_OPEN_MODE "w+"
 
 /**Titles**/
 #define ERROR_TITLE "---ERROR---"
