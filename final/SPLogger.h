@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "Utils/LoggerMessages.h"
 
 //File open mode
 #define SP_LOGGER_OPEN_MODE "w+"
@@ -38,7 +39,7 @@
 #define LOGGER_INFO_FORMAT "---INFO---\n- message: %s\n"
 #define LOGGER_MSG_FORMAT "%s\n"
 #define STDOUT "stdout"
-	/** A type used to decide the level of the logger**/
+/** A type used to decide the level of the logger**/
 typedef enum sp_logger_level_t {
 	SP_LOGGER_ERROR_LEVEL, //Error level
 	SP_LOGGER_WARNING_ERROR_LEVEL, //Warning level
