@@ -4,7 +4,6 @@
 #include "unit_test_util.h" //SUPPORTING MACROS ASSERT_TRUE/ASSERT_FALSE etc..
 #include "../SPLogger.h"
 
-
 // This is a helper function which checks if two files are identical
 static bool identicalFiles(const char* fname1, const char* fname2) {
 	FILE *fp1, *fp2;
@@ -46,13 +45,13 @@ static bool basicLoggerTest() {
 static bool basicLoggerErrorTest() {
 	const char* expectedFile = "basicLoggerErrorTestExp.log";
 	const char* testFile = "basicLoggerErrorTest.log";
-	ASSERT_TRUE(spLoggerCreate(testFile,SP_LOGGER_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerCreate(testFile, SP_LOGGER_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintError("MSGA","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintInfo("MSGC") == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintDebug("MSGD","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
 	spLoggerDestroy();
-	ASSERT_TRUE(identicalFiles(testFile,expectedFile));
+	ASSERT_TRUE(identicalFiles(testFile, expectedFile));
 	return true;
 }
 
@@ -60,19 +59,52 @@ static bool basicLoggerErrorTest() {
 static bool basicLoggerDebugTest() {
 	const char* expectedFile = "basicLoggerDebugTestExp.log";
 	const char* testFile = "basicLoggerDebugTest.log";
-	ASSERT_TRUE(spLoggerCreate(testFile,SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerCreate(testFile, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintError("MSGA","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintInfo("MSGC") == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintDebug("MSGD","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
 	spLoggerDestroy();
-	ASSERT_TRUE(identicalFiles(testFile,expectedFile));
+	ASSERT_TRUE(identicalFiles(testFile, expectedFile));
+	return true;
+}
+//Errors and Warnings should be printed
+static bool basicLoggerWarningTest() {
+	const char* expectedFile = "basicLoggerWarningTestExp.log";
+	const char* testFile = "basicLoggerWarningTest.log";
+	ASSERT_TRUE(spLoggerCreate(testFile, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintError("MSGA","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintInfo("MSGC") == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintDebug("MSGD","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+	ASSERT_TRUE(identicalFiles(testFile, expectedFile));
+	return true;
+}
+static bool basicLoggerInfoTest() {
+	const char* expectedFile = "basicLoggerInfoTestExp.log";
+	const char* testFile = "basicLoggerInfoTest.log";
+	ASSERT_TRUE(spLoggerCreate(testFile, SP_LOGGER_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintError("MSGA","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintInfo("MSGC") == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintDebug("MSGD","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+	ASSERT_TRUE(identicalFiles(testFile, expectedFile));
 	return true;
 }
 
-int main2() {
+static bool loggerStdoutTest() {
+
+	return true;
+}
+int main() {
+
 	RUN_TEST(basicLoggerTest);
 	RUN_TEST(basicLoggerErrorTest);
 	RUN_TEST(basicLoggerDebugTest);
+	RUN_TEST(basicLoggerWarningTest);
+	RUN_TEST(basicLoggerInfoTest);
+	RUN_TEST(loggerStduoutTest);
 	return 0;
 }
