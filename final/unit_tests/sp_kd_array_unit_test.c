@@ -10,6 +10,7 @@
 #include "../KDArray.h"
 #include <stdlib.h>
 
+#include "../KDTree.h"
 
 
 int main( int argc, const char* argv[] )
@@ -78,6 +79,5 @@ int main( int argc, const char* argv[] )
 
 	printf("this is the initial array:\n");
 	print_KDArr(kdarr);
-	return 1;
-
+	//KDTKDTreeInit(ar,  5,  3,  MAX_SPREAD);
 }
