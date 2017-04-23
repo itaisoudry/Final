@@ -152,12 +152,15 @@ int setConfigDefaultValues(SPConfig config) {
 	strcpy(config->spImagesSuffix, EMPTY_STR);
 	strcpy(config->spLoggerFilename, DEFAULT_LOGGER);
 	strcpy(config->spPCAFilename, DEFAULT_PCA);
+
 	return resultValue;
+
 	error: SMART_FREE(config->spImagesDirectory);
 	SMART_FREE(config->spImagesPrefix);
 	SMART_FREE(config->spImagesSuffix);
 	SMART_FREE(config->spLoggerFilename);
 	SMART_FREE(config->spPCAFilename);
+
 	return resultValue;
 
 }
@@ -168,12 +171,12 @@ int validateConfig(SPConfig config, const char* filename, int numberOfLines) {
 		printErrorMessage(filename, numberOfLines, msg);
 		return CFG_MISSING_DIR;
 	}
-	if (strcmp(config->spImagesPrefix, EMPTY_STR)==0) {
+	if (strcmp(config->spImagesPrefix, EMPTY_STR) == 0) {
 		sprintf(msg, ERROR_MISSING_ARG, SP_IMAGES_PREFIX);
 		printErrorMessage(filename, numberOfLines, msg);
 		return CFG_MISSING_PREFIX;
 	}
-	if (strcmp(config->spImagesSuffix, EMPTY_STR)==0) {
+	if (strcmp(config->spImagesSuffix, EMPTY_STR) == 0) {
 		sprintf(msg, ERROR_MISSING_ARG, SP_IMAGES_SUFFIX);
 		printErrorMessage(filename, numberOfLines, msg);
 		return CFG_MISSING_SUFFIX;
@@ -350,7 +353,7 @@ int validateAndInsert(SPConfig config, const char* filename, int lineNumber,
 			config->spKNN = intValue;
 		}
 	}
-	if (strcmp(key, SP_LOGGER_LEVEL) == 0) {
+	if (strcmp(key, SP_LOGGER_LEVEL_TITLE) == 0) {
 		intValue = atoi(value);
 		//value must be positive
 		if (intValue < 1 || intValue > 4) {
