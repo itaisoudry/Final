@@ -44,7 +44,7 @@
 #define SP_NUM_FEATURES "spNumOfFeatures"
 #define SP_NUM_SIMILAR_IMAGES "spNumOfSimilarImages"
 #define SP_KNN "spKNN"
-#define SP_LOGGER_LEVEL "spLoggerLevel"
+#define SP_LOGGER_LEVEL_TITLE "spLoggerLevel"
 #define SP_MIN_GUI "spMinimalGUI"
 #define SP_EXTRACTION_MODE "spExtractionMode"
 #define SP_KDTREE_SPLIT_METHOD "spKDTreeSplitMethod"
@@ -64,7 +64,6 @@
 #define PNG ".png"
 
 #define NEGATIVE -1
-
 
 /**
  * A data-structure which is used for configuring the system.
@@ -86,7 +85,7 @@ typedef enum sp_config_msg_t {
 
 typedef enum sp_kdtree_split_method_t {
 	RANDOM, MAX_SPREAD, INCREMENTAL
-}SP_KDTREE_SPLIT_METHODS;
+} SP_KDTREE_SPLIT_METHODS;
 
 typedef struct sp_config_t {
 	char* spImagesDirectory;
@@ -100,7 +99,7 @@ typedef struct sp_config_t {
 	int spNumOfFeatures;
 	int spNumOfSimilarImages;
 	int spKNN;
-	int spLoggerLevel;
+	SP_LOGGER_LEVEL spLoggerLevel;
 
 	bool spMinimalGUI;
 	bool spExtractionMode;
