@@ -28,6 +28,15 @@ SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg) {
 	*msg = responseCodeToConfigMessage(resultValue);
 	return NULL;
 }
+const char* spConfigGetDirectory(SPConfig config,SP_CONFIG_MSG* msg){
+	assert(msg != NULL);
+	if (config == NULL) {
+		*msg = SP_CONFIG_INVALID_ARGUMENT;
+		return NULL;
+	}
+	*msg = SP_CONFIG_SUCCESS;
+	return config->spImagesDirectory;
+}
 bool spConfigIsExtractionMode(const SPConfig config, SP_CONFIG_MSG* msg) {
 	assert(msg != NULL);
 	if (config == NULL) {

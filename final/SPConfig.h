@@ -132,8 +132,11 @@ typedef struct sp_config_t {
  *
  *
  */
+
 SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg);
 
+//TODO description
+const char* spConfigGetDirectory(const SPConfig config,SP_CONFIG_MSG* msg);
 /*
  * Returns true if spExtractionMode = true, false otherwise.
  *

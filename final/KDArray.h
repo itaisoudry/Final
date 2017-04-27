@@ -26,8 +26,7 @@ typedef struct KD_Array {
 } SPKDArray;
 
 int Split(SPKDArray* KDarr, int coor, SPKDArray* left, SPKDArray* right);
-SPKDArray* init(SPPoint** array, int size);
-int mallocCheck(void* p);
+int init(SPKDArray* res, SPPoint** array, int size);
 int comp_by_coor(const void* a, const void* b);
 
 typedef struct coorToComp {

@@ -13,8 +13,9 @@
 #include "../KDTree.h"
 
 
-int main( int argc, const char* argv[] )
+int main2( int argc, const char* argv[] )
 {
+	int resultValue =SUCCESS;
 	double dataA[3]={1,2,3};
 	double dataB[3]={4,1,7};
 	double dataC[3]={0,8,9};
@@ -41,7 +42,9 @@ int main( int argc, const char* argv[] )
 
 	SPPoint* arr[5]= {a,b,c,d,e};
 	SPPoint** ar=&arr[0];
-	SPKDArray* kdarr = init(ar,5);
+	SPKDArray* kdarr;
+	SMART_MALLOC(SPKDArray*,kdarr,sizeof(SPKDArray));
+	SMART_FUNCTION_CALL(init(kdarr,ar,5));
 	printf("this is the initial array:\n");
 	print_KDArr(kdarr);
 	SPKDArray* left =(SPKDArray*) malloc (sizeof(SPKDArray*));
@@ -80,4 +83,10 @@ int main( int argc, const char* argv[] )
 	printf("this is the initial array:\n");
 	print_KDArr(kdarr);
 	//KDTKDTreeInit(ar,  5,  3,  MAX_SPREAD);
+	SMART_FREE(kdarr);
+
+	return resultValue;
+	error:
+	SMART_FREE(kdarr);
+	return resultValue;
 }
