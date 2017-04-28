@@ -8,10 +8,10 @@
 #include "SPImageProc.h"
 
 extern "C" {
+#include "SPConfig.h"
 #include "SPLogger.h"
 #include "Utils/AllocationHandler.h"
 #include "Utils/ResponseCodes.h"
-#include "SPConfig.h"
 #include "KDTree.h"
 #include "main_aux.h"
 }
@@ -26,8 +26,8 @@ extern "C" {
 #define ERROR_MISSING_ARGS "Error: Invalid arguments in command line\n"
 #define ERROR_LOGGER "Error creating logger\n"
 #define ERROR_CREATE_IMG_PRC "Error creating ImageProc\n"
+#define LOGGER_CREATED "Logger created\n"
 
-#define LOGGER_CRERATED "Logger Created"\n
 
 #define CONFIG_FLAG "-c"
 #define DEFAULT_CFG_FILE "spcbir.config"
@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
 	char imagePath[LINE_LENGTH];
 
 	//variables
-	SPPoint** arrayToKDARR;
+	SPPoint** arrayToKDARR=NULL;
 	SPPoint*** imageProcessFeatures;
 	int spNumOfImages, spPCADimension=20, spNumOfFeatures, spNumOfSimilarImages, spKNN, spNumOfFeaturesTotal, splitMethod;
 	bool spMinimalGUI;
@@ -51,6 +51,7 @@ int main(int argc, char** argv) {
 	int* nearestNeighbors;
 	int* histogram;
 	char* imgPathToShow;
+	int q=0;
 	SMART_MALLOC(char*,imgPathToShow,sizeof(char)*1024);
 
 
@@ -89,7 +90,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 	//TODO - LOGGER INITIALIZE MSG
-	//spLoggerPrintInfo (LOGGER_CREATED);
+	spLoggerPrintInfo (LOGGER_CREATED);
 
 	//Create image proccess
 	imageProcess = new sp::ImageProc(config);
@@ -129,7 +130,7 @@ int main(int argc, char** argv) {
 	}
 	spNumOfFeaturesTotal=0;
 	spLoggerPrintInfo(EXTRACTION_MODE_FINISHED);
-	int q=0;
+
 	for (int i=0;i<spNumOfImages;i++){
 		spNumOfFeaturesTotal += featsArr[i];
 		memcpy(&arrayToKDARR[q],imageProcessFeatures[i],sizeof(SPPoint**)*featsArr[i]);
@@ -149,7 +150,7 @@ int main(int argc, char** argv) {
 	spLoggerPrintInfo(PREPROCESSING_FINISHED);
 
 	spLoggerPrintInfo(QUERY_USER);
-
+	spMinimalGUI = config->spMinimalGUI;
 	//please enter image path
 	char* input ;
 	SMART_MALLOC(char*,input,sizeof(char)*1024);
@@ -168,7 +169,7 @@ int main(int argc, char** argv) {
 		SMART_MALLOC(int*,histogram,sizeof(int)*spNumOfImages);
 
 		for(int i=0;i<spNumOfFeatures;i++){
-			SMART_FUNCTION_CALL(KDTreeSearch(nearestNeighbors,tree,spKNN,queryFeats[i]));
+			KDTreeSearch(nearestNeighbors,tree,spKNN,queryFeats[i]);
 			if(nearestNeighbors==NULL){
 				spLoggerPrintError("KDTreeSearch failed", __FILE__,
 										__FUNCTION__, __LINE__);

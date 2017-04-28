@@ -27,6 +27,8 @@ SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg) {
 	SMART_FREE(config);
 	*msg = responseCodeToConfigMessage(resultValue);
 	return NULL;
+	return config;
+
 }
 const char* spConfigGetDirectory(SPConfig config,SP_CONFIG_MSG* msg){
 	assert(msg != NULL);

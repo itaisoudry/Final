@@ -26,8 +26,9 @@ typedef struct KD_Tree_NODE KDTreeNode;
 KDTreeNode* NodeInit(int dim, double val, KDTreeNode* left, KDTreeNode* right, SPKDArray* data) ;
 int KDTreeInit(KDTreeNode* tree, SPPoint** p, int n, int d, int splitMethod) ;
 KDTreeNode* KDTreeBuild(SPKDArray* kdarr, int splitMethod, int iSplit) ;
-int maxSpread(SPKDArray* kdarray) ;
 int KDTreeSearch(int* res, KDTreeNode* root, int SPKNN, SPPoint* p);
+
+int maxSpread(SPKDArray* kdarray) ;
 int treeSize ();
 
 

@@ -69,20 +69,31 @@ int maxSpread(SPKDArray* kdarray) {
 
 	}
 	return j;
-
+}
 	KDTreeNode* KDTreeBuild(SPKDArray* kdarr, int splitMethod, int iSplit) {
 		int isplit;
-		double val;
-		int mid;
-		int idx;
+		double val=0;
+		int mid=0;
+		int idx=0;
 		int n = kdarr->n;
 		int d = kdarr->d;
 
-		KDTreeNode* left ;
+		KDTreeNode* left;
 		KDTreeNode* right;
-		SPKDArray* leftArr;
-		SPKDArray* rightArr;
+		SPKDArray* leftArr = (SPKDArray*) malloc (sizeof(SPKDArray));
+		if (!leftArr){
+			//TODO logger
+			return NULL;
+		}
+		SPKDArray* rightArr= (SPKDArray*) malloc (sizeof(SPKDArray));
+		if (!rightArr){
+			free(leftArr);
+			//TODO logger
+			return NULL;
+		}
 		if (n == 1) {
+			free(leftArr);
+			free(rightArr);
 			return NodeInit(-1, -1, NULL, NULL, kdarr);
 		}
 		if (splitMethod == RANDOM) {
@@ -93,11 +104,15 @@ int maxSpread(SPKDArray* kdarray) {
 			isplit = maxSpread(kdarr);
 
 		} else {
+			free(leftArr);
+			free(rightArr);
 			return NULL;
 
 		}
 		val = spPointGetAxisCoor(kdarr->arr[idx], isplit);
 		if (val<0){
+			free(leftArr);
+			free(rightArr);
 			return NULL;//TODO error
 		}
 		idx = kdarr->mat[isplit][mid];
@@ -108,6 +123,8 @@ int maxSpread(SPKDArray* kdarray) {
 		}
 
 		if (Split(kdarr, isplit, leftArr, rightArr) < 0) {
+			free(leftArr);
+			free(rightArr);
 			return NULL;
 		}
 
@@ -115,8 +132,12 @@ int maxSpread(SPKDArray* kdarray) {
 		right = KDTreeBuild(rightArr, splitMethod, isplit);
 
 		if (!left || !right) {
+			free(leftArr);
+			free(rightArr);
 			return NULL;
 		}
+		free(leftArr);
+		free(rightArr);
 		return NodeInit(isplit, val, left, right, NULL);
 		//TODO logger errors
 	}
@@ -185,7 +206,7 @@ int maxSpread(SPKDArray* kdarray) {
 		}
 
 
-		for (i = 0; i < SPKNN; i++) {
+		for (int i = 0; i < SPKNN; i++) {
 			SMART_FUNCTION_CALL(spBPQueuePeek(bpq,curr));
 
 			res[i] = curr->index;
@@ -201,4 +222,4 @@ int maxSpread(SPKDArray* kdarray) {
 
 	}
 
-}
+
