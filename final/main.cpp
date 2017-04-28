@@ -26,6 +26,8 @@ extern "C" {
 #define ERROR_LOGGER "Error creating logger\n"
 #define ERROR_CREATE_IMG_PRC "Error creating ImageProc\n"
 
+#define LOGGER_CRERATED "Logger Created"\n
+
 #define CONFIG_FLAG "-c"
 #define DEFAULT_CFG_FILE "spcbir.config"
 
