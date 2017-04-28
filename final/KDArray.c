@@ -182,9 +182,7 @@ int Split(SPKDArray* KDarr, int coor, SPKDArray* left, SPKDArray* right) {
 		SMART_MALLOC(int*,mat1[i],middle*sizeof(int));
 		SMART_MALLOC(int*,mat2[i],middle*sizeof(int));
 	}
-	//TODO ask soudry
-	//SMART_MALLOC((int**),mat1,sizeof(int)*middle*d);
-	//SMART_MALLOC((int**),mat2,sizeof(int)*(n-middle/)*d;
+
 	j = 0;
 	k = 0;
 
