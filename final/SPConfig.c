@@ -7,13 +7,11 @@
 #include "SPConfig.h"
 int extractConfigDataFromFile(const char* filename, SPConfig config);
 int setConfigDefaultValues(SPConfig config);
-int extractDataFromLine(SPConfig config, const char* filename, char* line,
-		int lineNumber);
+int extractDataFromLine(SPConfig config, const char* filename, char* line, int lineNumber);
 char* trimSpacesFromBothSides(char* line);
 void printErrorMessage(const char* filename, int lineNumber, char* msg);
 
-int validateAndInsert(SPConfig config, const char* filename, int lineNumber,
-		char* key, char* value);
+int validateAndInsert(SPConfig config, const char* filename, int lineNumber, char* key, char* value);
 SP_CONFIG_MSG responseCodeToConfigMessage(ResponseCode code);
 SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg) {
 	SPConfig config = NULL;
@@ -30,7 +28,7 @@ SPConfig spConfigCreate(const char* filename, SP_CONFIG_MSG* msg) {
 	return config;
 
 }
-const char* spConfigGetDirectory(SPConfig config,SP_CONFIG_MSG* msg){
+const char* spConfigGetDirectory(SPConfig config, SP_CONFIG_MSG* msg) {
 	assert(msg != NULL);
 	if (config == NULL) {
 		*msg = SP_CONFIG_INVALID_ARGUMENT;
@@ -89,35 +87,36 @@ int spConfigGetPCADim(const SPConfig config, SP_CONFIG_MSG* msg) {
 	return config->spPCADimension;
 }
 
-SP_CONFIG_MSG spConfigGetImagePath(char* imagePath, const SPConfig config,
-		int index) {
+SP_CONFIG_MSG spConfigGetImagePath(char* imagePath, const SPConfig config, int index) {
+	char indexStr[LINE_LENGTH];
+
 	if (config == NULL || imagePath == NULL)
 		return SP_CONFIG_INVALID_ARGUMENT;
 	if (index >= config->spNumOfImages)
 		return SP_CONFIG_INDEX_OUT_OF_RANGE;
 	int resultValue = SUCCESS;
-	char*path = NULL;
-	SMART_MALLOC(char*, path, LINE_LENGTH*sizeof(char));
-	return responseCodeToConfigMessage(resultValue);
-	error:
-	SMART_FREE(path);
+
+	strcpy(imagePath, config->spImagesDirectory);
+	strcat(imagePath,config->spImagesPrefix);
+	sprintf(indexStr,"%d",index);
+	strcat(imagePath,indexStr);
+	strcat(imagePath,config->spImagesSuffix);
+
 	return responseCodeToConfigMessage(resultValue);
 }
 
 SP_CONFIG_MSG spConfigGetPCAPath(char* pcaPath, const SPConfig config) {
 	if (config == NULL || pcaPath == NULL)
 		return SP_CONFIG_INVALID_ARGUMENT;
-//won't be used here.
 	int resultValue = SUCCESS;
 	char* path = NULL;
+
 	SMART_MALLOC(char*, path, LINE_LENGTH*sizeof(char));
+
 	strcpy(path, EMPTY_STR);
 	strcat(path, config->spImagesDirectory);
 	strcat(path, config->spPCAFilename);
-	if (sizeof(pcaPath) < strlen(path)) {
-		SMART_FREE(path);
-		return SP_CONFIG_INVALID_ARGUMENT;
-	}
+
 	strcpy(pcaPath, EMPTY_STR);
 	strcpy(pcaPath, path);
 	return responseCodeToConfigMessage(resultValue);
@@ -219,8 +218,7 @@ int extractConfigDataFromFile(const char* filename, SPConfig config) {
 		//trim
 		line = trimSpacesFromBothSides(line);
 		//if first char is not '#' or new line or empty string
-		if (line[0] != COMMENT && strcmp(line, EMPTY_STR) != 0
-				&& strcmp(line, NEW_LINE) != 0) {
+		if (line[0] != COMMENT && strcmp(line, EMPTY_STR) != 0 && strcmp(line, NEW_LINE) != 0) {
 
 			commentPtr = strchr(line, COMMENT);
 
@@ -229,8 +227,7 @@ int extractConfigDataFromFile(const char* filename, SPConfig config) {
 			}
 
 			// extract config key and value from line - if not valid, error will be printed and the program will end
-			SMART_FUNCTION_CALL(
-					extractDataFromLine(config, filename, line, lineNumber));
+			SMART_FUNCTION_CALL(extractDataFromLine(config, filename, line, lineNumber));
 			// assign variables to config
 		}
 
@@ -245,8 +242,7 @@ int extractConfigDataFromFile(const char* filename, SPConfig config) {
 	return resultValue;
 
 }
-int extractDataFromLine(SPConfig config, const char* filename, char* line,
-		int lineNumber) {
+int extractDataFromLine(SPConfig config, const char* filename, char* line, int lineNumber) {
 	int resultValue = SUCCESS;
 	char* equalsPtr = NULL;
 	char* key = NULL;
@@ -267,15 +263,13 @@ int extractDataFromLine(SPConfig config, const char* filename, char* line,
 	if (strchr(key, SPACE) != NULL) {
 		printErrorMessage(filename, lineNumber, INVALID_CFG_LINE);
 	}
-	SMART_FUNCTION_CALL(
-			validateAndInsert(config, filename, lineNumber, key, value));
+	SMART_FUNCTION_CALL(validateAndInsert(config, filename, lineNumber, key, value));
 	return resultValue;
 	error: return resultValue;
 
 }
 
-int validateAndInsert(SPConfig config, const char* filename, int lineNumber,
-		char* key, char* value) {
+int validateAndInsert(SPConfig config, const char* filename, int lineNumber, char* key, char* value) {
 	int resultValue = SUCCESS;
 	int intValue = 0;
 	if (strcmp(key, SP_IMAGES_DIR) == 0) {
@@ -296,8 +290,7 @@ int validateAndInsert(SPConfig config, const char* filename, int lineNumber,
 	}
 	if (strcmp(key, SP_IMAGES_SUFFIX) == 0) {
 		//suffix must be gif/bmp/jps/png
-		if (strcmp(value, BMP) != 0 && strcmp(value, JPG) != 0
-				&& strcmp(value, GIF) != 0 && strcmp(value, PNG)) {
+		if (strcmp(value, BMP) != 0 && strcmp(value, JPG) != 0 && strcmp(value, GIF) != 0 && strcmp(value, PNG)) {
 			resultValue = CFG_INVALID_ARGUMENT;
 		} else {
 			strcpy(config->spImagesSuffix, value);
@@ -391,8 +384,7 @@ int validateAndInsert(SPConfig config, const char* filename, int lineNumber,
 	}
 	if (strcmp(key, SP_KDTREE_SPLIT_METHOD) == 0) {
 		intValue = atoi(value);
-		if (intValue != RANDOM && intValue != MAX_SPREAD
-				&& intValue != INCREMENTAL) {
+		if (intValue != RANDOM && intValue != MAX_SPREAD && intValue != INCREMENTAL) {
 			resultValue = CFG_INVALID_ARGUMENT;
 		} else {
 			config->spKDTreeSplitMethod = intValue;
