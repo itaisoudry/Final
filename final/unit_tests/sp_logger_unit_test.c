@@ -94,10 +94,6 @@ static bool basicLoggerInfoTest() {
 	return true;
 }
 
-static bool loggerStdoutTest() {
-
-	return true;
-}
 int main3() {
 
 	RUN_TEST(basicLoggerTest);
