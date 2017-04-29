@@ -31,7 +31,7 @@ int comp_by_coor(const void* a, const void* b);
 
 typedef struct coorToComp {
 	int pointIndex;
-	int coorData;
+	double coorData;
 } CTC;
 void print_KDArr(SPKDArray* arr);
 

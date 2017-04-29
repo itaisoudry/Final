@@ -9,7 +9,7 @@
 // coordinate printer for test
 int print_coor(CTC coor) {
 	int resultValue = SUCCESS;
-	printf("data: %d ", coor.coorData);
+	printf("data: %f ", coor.coorData);
 	printf("idx: %d \n", coor.pointIndex);
 	return resultValue;
 }
@@ -58,8 +58,9 @@ int init(SPKDArray* res, SPPoint** array, int size) {
 	SMART_MALLOC(CTC*, helpArr, size * sizeof(CTC));
 
 	SMART_MALLOC(SPPoint**, pointsArray, sizeof(SPPoint*) * size);
-
-	memcpy(pointsArray, array, sizeof(SPPoint*) * size); //copying the array
+	for (int i=0;i<size;i++){
+		pointsArray[i]=spPointCopy(array[i]);
+	}
 	int d = spPointGetDimension(array[0]);
 	res->d = d;
 	res->n = size;
@@ -79,7 +80,6 @@ int init(SPKDArray* res, SPPoint** array, int size) {
 		}
 
 	}
-
 	int j = 0; // this is the coordinate var.
 	while (j < d) { //build an array of ctc for every coordinate, sorts it and inserts to the suitable row in mat.
 		for (int i = 0; i < size; i++) {

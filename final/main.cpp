@@ -128,20 +128,23 @@ int main(int argc, char** argv) {
 	}
 	spNumOfFeaturesTotal = 0;
 	spLoggerPrintInfo(EXTRACTION_MODE_FINISHED);
-
 	for (int i = 0; i < spNumOfImages; i++) {
 		spNumOfFeaturesTotal += featsArr[i];
-		memcpy(&arrayToKDARR[q], imageProcessFeatures[i], sizeof(SPPoint**) * featsArr[i]);
+	}
+	SMART_MALLOC(SPPoint**,arrayToKDARR,spNumOfFeaturesTotal*sizeof(SPPoint*));
+
+	for (int i=0; i<spNumOfImages;i++){
+		memcpy(&arrayToKDARR[q], imageProcessFeatures[i], sizeof(SPPoint*) * featsArr[i]);
 		q += featsArr[i];
 	}
 	spPCADimension = config->spPCADimension;
 	splitMethod = config->spKDTreeSplitMethod;
 	spKNN = config->spKNN;
 	SMART_MALLOC(KDTreeNode*, tree, treeSize());
-	SMART_MALLOC(int*, nearestNeighbors, sizeof(int));
+	SMART_MALLOC(int*, nearestNeighbors, sizeof(int)*spKNN);
 
-	SMART_FUNCTION_CALL(KDTreeInit(tree, arrayToKDARR, spNumOfFeaturesTotal, spPCADimension, splitMethod));
-	//pre processing phase started
+	SMART_FUNCTION_CALL(KDTreeInit(tree, arrayToKDARR, spNumOfFeaturesTotal, splitMethod));
+	//pre processing phase starSted
 	spLoggerPrintInfo(PREPROCESSING_STARTED);
 
 	//pre processing phase finished
@@ -150,21 +153,24 @@ int main(int argc, char** argv) {
 	spLoggerPrintInfo(QUERY_USER);
 	spMinimalGUI = config->spMinimalGUI;
 	//please enter image path
-	char* input;
-	SMART_MALLOC(char*, input, sizeof(char) * 1024);
+	char input[1024];
 	printf(ENTER_IMG_PATH);
 	fflush(stdout);
 	while (scanf("%s", input) != 0) {
 		if (!strcmp(input, "<>")) {
-			return SUCCESS;
+			break;
 		}
-		SPPoint** queryFeats = imageProcess->getImageFeatures(input, 1024, &spNumOfFeatures);
+		SPPoint** queryFeats = imageProcess->getImageFeatures(input,spPCADimension+1 , &spNumOfFeatures);
 		if (queryFeats == NULL) {
 			printf("%s is not found, try again:\n", input);
 			continue;
 		}
+		spNumOfSimilarImages = config->spNumOfSimilarImages;
 
-		SMART_MALLOC(int*, histogram, sizeof(int) * spNumOfImages);
+		SMART_MALLOC(int*, histogram, sizeof(int) * spNumOfSimilarImages);
+		for (int j = 0; j < spKNN; j++) {
+						histogram[j] = 0;
+					}
 
 		for (int i = 0; i < spNumOfFeatures; i++) {
 			KDTreeSearch(nearestNeighbors, tree, spKNN, queryFeats[i]);
@@ -172,12 +178,11 @@ int main(int argc, char** argv) {
 				spLoggerPrintError("KDTreeSearch failed", __FILE__, __FUNCTION__, __LINE__);
 				return -1;
 			}
-			for (int j = 0; j < spKNN; j++) {
+			for (int j = 0; j < spNumOfSimilarImages; j++) {
 				histogram[nearestNeighbors[j]] += 1;
 			}
 		}
 		qsort(histogram, spNumOfImages, sizeof(int), cmpfunc);
-		spNumOfSimilarImages = config->spNumOfSimilarImages;
 
 		if (spMinimalGUI) {
 			for (int i = 0; i < spNumOfSimilarImages; i++) {
@@ -198,19 +203,19 @@ int main(int argc, char** argv) {
 				printf("<%s>\n", imgPathToShow);
 				fflush(stdout);
 			}
+			SMART_FREE(imgPathToShow);
+			SMART_FREE(nearestNeighbors);
+			SMART_FREE(histogram);
 
 		}
 		printf(ENTER_IMG_PATH);
 		fflush(stdout);
 	}
 	printf("Exiting...\n");
-	SMART_FREE(imgPathToShow);
 	SMART_FREE(imageProcessFeatures);
 	SMART_FREE(featsArr);
 	SMART_FREE(tree);
-	SMART_FREE(nearestNeighbors);
-	SMART_FREE(input);
-	SMART_FREE(histogram);
+
 
 	return resultValue;
 	error:
@@ -219,7 +224,6 @@ int main(int argc, char** argv) {
 	SMART_FREE(featsArr);
 	SMART_FREE(tree);
 	SMART_FREE(nearestNeighbors);
-	SMART_FREE(input);
 	SMART_FREE(histogram);
 	return resultValue;
 }

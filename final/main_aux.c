@@ -8,6 +8,7 @@
 #include "Utils/AllocationHandler.h"
 #include "Utils/ResponseCodes.h"
 #include <stdbool.h>
+#include <string.h>
 //config msg
 
 
@@ -17,21 +18,21 @@ int saveOrLoadFeatsToFile(SPPoint*** featsArr, int numOfImages, SPConfig config,
 	FILE* file;
 	int  d;
 	double data;
-	char* filename, imagePrefix , directory;
-	SMART_MALLOC(char*,filename,1024*sizeof(char));
+	char filename[1024], imagePrefix[1024] , directory[1024];
+	//SMART_MALLOC(char**,filename,1024*sizeof(char));
 	//char directory[1024];
 				   //, imagepefix[1024];
-	SMART_MALLOC(char*,directory,1024*sizeof(char));
+	//SMART_MALLOC(char**,directory,1024*sizeof(char));
 	//SMART_MALLOC(char*,imagePrefix,1024*sizeof(char));
-
-	directory = spConfigGetDirectory(config,msg);
+	memcpy(directory, config->spImagesDirectory,strlen(config->spImagesDirectory));
 	if (*msg!=SP_CONFIG_SUCCESS){
 		//TODO error
 	}
-	imagePrefix = config->spImagesPrefix;
+	memcpy(imagePrefix, config->spImagesPrefix,strlen(config->spImagesPrefix));
+
 	if (spExtractionMode) { //save
 		for (int i; i < numOfImages; i++) {
-			sprintf(filename, "%s%s%d.%s", directory, imagePrefix, i, "feats");
+			sprintf(&filename[0], "%s%s%d.%s", directory, imagePrefix, i, "feats");
 			file = fopen(filename, "wb");
 			if (!file) {
 				*msg = SP_CONFIG_CANNOT_OPEN_FILE;
@@ -42,11 +43,13 @@ int saveOrLoadFeatsToFile(SPPoint*** featsArr, int numOfImages, SPConfig config,
 			for (int j = 0; j < featsArrNum[i]; j++) {
 				d = spPointGetDimension(featsArr[i][j]);
 				fwrite(&d, sizeof(int), 1, file);
-				for (int k; k < d; k++) {
+				for (int k=0; k < d; k++) {
 					data = spPointGetAxisCoor(featsArr[i][j],k);
 					fwrite(&data, sizeof(double), 1, file);
 				}
 			}
+			fclose(file);
+
 		}
 	} else { //load
 		int curr;
@@ -67,16 +70,13 @@ int saveOrLoadFeatsToFile(SPPoint*** featsArr, int numOfImages, SPConfig config,
 				fread(&data, sizeof(double), d, file);
 				featsArr[i][j] = spPointCreate(&data, d, i);
 			}
+			fclose(file);
 		}
 	}
-	fclose(file);
-	SMART_FREE(directory);
-	SMART_FREE(filename);
 	*msg = SP_CONFIG_SUCCESS;
 	return resultValue;
 	error:
-		SMART_FREE(directory);
-		SMART_FREE(filename);
+
 
 		if (!spExtractionMode) {
 		for (int i = 0; i < numOfImages; i++) {
