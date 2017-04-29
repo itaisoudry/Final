@@ -39,43 +39,7 @@ KDTreeNode* NodeInit(int dim, double val, KDTreeNode* left, KDTreeNode* right, S
 
 	return node;
 }
- int KDTreeInit(KDTreeNode* tree, SPPoint** p, int n, int splitMethod) {
-	int resultValue = SUCCESS;
-
-	SPKDArray* kdarr =NULL;
-	SMART_MALLOC(SPKDArray*, kdarr, sizeof(SPKDArray)*n);
-	SMART_FUNCTION_CALL(init(kdarr,p, n));
-	KDTreeNode* root = KDTreeBuild(kdarr, splitMethod, (-1));
-	tree->data =root->data;
-	tree->dim =root->dim;
-	tree->left =root->left;
-	tree->right =root->right;
-	tree->val =root->val;
-
-	return resultValue;
-	error:
-				SMART_FREE(kdarr);
-				return resultValue;
-
-}
-int maxSpread(SPKDArray* kdarray) {
-	int  j = 0;
-	double min, max;
-	double maxS = 0;
-
-	for (int i = 0; i < kdarray->d; i++) {
-		min = spPointGetAxisCoor((kdarray->arr[kdarray->mat[i][0]]), i);
-		max = spPointGetAxisCoor(kdarray->arr[kdarray->mat[i][kdarray->n - 1]], i);
-		//TODO if min||max <0 then error
-		if ((max - min) > maxS) {
-			maxS = max - min;
-			j = i;
-		}
-
-	}
-	return j;
-}
-	KDTreeNode* KDTreeBuild(SPKDArray* kdarr, int splitMethod, int i_Split) {
+KDTreeNode* KDTreeBuild(SPKDArray* kdarr, int splitMethod, int i_Split) {
 		int isplit;
 		double val=0;
 		int mid=0;
@@ -208,39 +172,77 @@ int maxSpread(SPKDArray* kdarray) {
 		return resultValue;
 
 	}
-
 	int KDTreeSearch(int* res, KDTreeNode* root, int SPKNN, SPPoint* p) {
-		int resultValue = SUCCESS;
-		BPQueueElement* curr = NULL;
+			int resultValue = SUCCESS;
+			BPQueueElement* curr = NULL;
 
-		SMART_MALLOC(BPQueueElement*, curr, sizeof(BPQueueElement));
-//		BPQueueElement curr = (BPQueueElement) malloc(sizeof(BPQueueElement));
+			SMART_MALLOC(BPQueueElement*, curr, sizeof(BPQueueElement));
+	//		BPQueueElement curr = (BPQueueElement) malloc(sizeof(BPQueueElement));
 
-		if (!root || SPKNN < 1){
-			resultValue= -1;
-			return resultValue;
-		}
-		SPBPQueue* bpq = spBPQueueCreate(SPKNN);
-		if (searchUtil(root, bpq, p) < 0) {
-			resultValue= -1;
-			return resultValue;
-		}
+			if (!root || SPKNN < 1){
+				resultValue= -1;
+				return resultValue;
+			}
+			SPBPQueue* bpq = spBPQueueCreate(SPKNN);
+			if (searchUtil(root, bpq, p) < 0) {
+				resultValue= -1;
+				return resultValue;
+			}
 
 
-		for (int i = 0; i < SPKNN; i++) {
-			spBPQueuePeek(bpq,curr);
+			for (int i = 0; i < SPKNN; i++) {
+				spBPQueuePeek(bpq,curr);
 
-			res[i] = curr->index;
-		}
+				res[i] = curr->index;
+			}
 
-		SMART_FREE(curr);
-		SMART_FREE(bpq);
-		return resultValue;
-		error:
 			SMART_FREE(curr);
 			SMART_FREE(bpq);
 			return resultValue;
+			error:
+				SMART_FREE(curr);
+				SMART_FREE(bpq);
+				return resultValue;
+
+		}
+
+
+
+ int KDTreeInit(KDTreeNode* tree, SPPoint** p, int n, int splitMethod) {
+	int resultValue = SUCCESS;
+
+	SPKDArray* kdarr =NULL;
+	SMART_MALLOC(SPKDArray*, kdarr, sizeof(SPKDArray)*n);
+	SMART_FUNCTION_CALL(init(kdarr,p, n));
+	KDTreeNode* root = KDTreeBuild(kdarr, splitMethod, (-1));
+	tree->data =root->data;
+	tree->dim =root->dim;
+	tree->left =root->left;
+	tree->right =root->right;
+	tree->val =root->val;
+
+	return resultValue;
+	error:
+				SMART_FREE(kdarr);
+				return resultValue;
+
+}
+int maxSpread(SPKDArray* kdarray) {
+	int  j = 0;
+	double min, max;
+	double maxS = 0;
+
+	for (int i = 0; i < kdarray->d; i++) {
+		min = spPointGetAxisCoor((kdarray->arr[kdarray->mat[i][0]]), i);
+		max = spPointGetAxisCoor(kdarray->arr[kdarray->mat[i][kdarray->n - 1]], i);
+		//TODO if min||max <0 then error
+		if ((max - min) > maxS) {
+			maxS = max - min;
+			j = i;
+		}
 
 	}
+	return j;
+}
 
 

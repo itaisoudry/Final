@@ -118,3 +118,14 @@ int cmpfunc (const void * a, const void * b)
 {
    return ( *(int*)a - *(int*)b );
 }
+int mostSimilar(int size, int* arr){
+	int mostSimilarElement = arr[0];
+	int indexOfElement=0;
+	for (int i = 0; i < size; i++) {
+		if (arr[i] > mostSimilarElement) {
+			mostSimilarElement = arr[i];
+			indexOfElement = i;
+		}
+	}
+	return indexOfElement;
+}

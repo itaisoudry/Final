@@ -33,6 +33,7 @@
 #define	MSG10 "SP_CONFIG_SUCCESS"
 
 int saveOrLoadFeatsToFile(SPPoint*** featsArr, int numOfImages, SPConfig config,int* featsArrNum, bool spExtractionMode, SP_CONFIG_MSG* msg);
+int mostSimilar(int size, int* arr);
 const char* configMsgToString( SP_CONFIG_MSG msg);
 int cmpfunc (const void * a, const void * b);
 

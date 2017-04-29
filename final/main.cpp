@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 	bool spMinimalGUI;
 	int* featsArr;
 	int* nearestNeighbors;
-	int* histogram;
+	int* nearestArr;
 	char* imgPathToShow;
 	int q = 0;
 	SMART_MALLOC(char*, imgPathToShow, sizeof(char) * 1024);
@@ -167,9 +167,9 @@ int main(int argc, char** argv) {
 		}
 		spNumOfSimilarImages = config->spNumOfSimilarImages;
 
-		SMART_MALLOC(int*, histogram, sizeof(int) * spNumOfSimilarImages);
+		SMART_MALLOC(int*, nearestArr, sizeof(int) * spKNN);
 		for (int j = 0; j < spKNN; j++) {
-						histogram[j] = 0;
+						nearestArr[j] = 0;
 					}
 
 		for (int i = 0; i < spNumOfFeatures; i++) {
@@ -178,16 +178,25 @@ int main(int argc, char** argv) {
 				spLoggerPrintError("KDTreeSearch failed", __FILE__, __FUNCTION__, __LINE__);
 				return -1;
 			}
-			for (int j = 0; j < spNumOfSimilarImages; j++) {
-				histogram[nearestNeighbors[j]] += 1;
+			for (int j = 0; j < spKNN; j++) {
+				nearestArr[nearestNeighbors[j]] += 1;
 			}
 		}
-		qsort(histogram, spNumOfImages, sizeof(int), cmpfunc);
+		int* results;
+		SMART_MALLOC(int*,results,sizeof(int)*spNumOfSimilarImages);
+		for (int i = 0; i < spNumOfSimilarImages; i++) {
+			results[i] = mostSimilar(spKNN, nearestArr);
+			nearestArr[results[i]] = 0;
+			}
 
 		if (spMinimalGUI) {
 			for (int i = 0; i < spNumOfSimilarImages; i++) {
-				configMsg = spConfigGetImagePath(imgPathToShow, config, histogram[i]);
+				configMsg = spConfigGetImagePath(imgPathToShow, config, results[i]);
 				if (configMsg != SP_CONFIG_SUCCESS) {
+					SMART_FREE(imgPathToShow);
+					SMART_FREE(nearestNeighbors);
+					SMART_FREE(nearestArr);
+					SMART_FREE(results);
 					break;
 				}
 				imageProcess->showImage(imgPathToShow);
@@ -196,8 +205,12 @@ int main(int argc, char** argv) {
 		} else {
 			printf("Best candidates for - <%s> - are:\n", input);
 			for (int i = 0; i < spNumOfSimilarImages; i++) {
-				configMsg = spConfigGetImagePath(imgPathToShow, config, histogram[i]);
+				configMsg = spConfigGetImagePath(imgPathToShow, config, results[i]);
 				if (configMsg != SP_CONFIG_SUCCESS) {
+					SMART_FREE(imgPathToShow);
+					SMART_FREE(nearestNeighbors);
+					SMART_FREE(nearestArr);
+					SMART_FREE(results);
 					break;
 				}
 				printf("<%s>\n", imgPathToShow);
@@ -205,7 +218,8 @@ int main(int argc, char** argv) {
 			}
 			SMART_FREE(imgPathToShow);
 			SMART_FREE(nearestNeighbors);
-			SMART_FREE(histogram);
+			SMART_FREE(nearestArr);
+			SMART_FREE(results);
 
 		}
 		printf(ENTER_IMG_PATH);
@@ -224,7 +238,8 @@ int main(int argc, char** argv) {
 	SMART_FREE(featsArr);
 	SMART_FREE(tree);
 	SMART_FREE(nearestNeighbors);
-	SMART_FREE(histogram);
+	SMART_FREE(nearestArr);
+
 	return resultValue;
 }
 
