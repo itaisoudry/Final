@@ -9,7 +9,6 @@
 #include "Utils/ResponseCodes.h"
 #include <stdbool.h>
 #include <string.h>
-//config msg
 
 int saveOrLoadFeatsToFile(SPPoint*** featsArr, int numOfImages, SPConfig config, int* featsArrNum,
 		bool spExtractionMode, SP_CONFIG_MSG* msg) {
@@ -59,6 +58,7 @@ int saveOrLoadFeatsToFile(SPPoint*** featsArr, int numOfImages, SPConfig config,
 			fread(&curr, sizeof(int), 1, file);
 			featsArrNum[i] = curr;
 			int malloc_size = sizeof(SPPoint*) * curr;
+
 			SMART_MALLOC(SPPoint**, featsArr[i], malloc_size);
 			for (int j = 0; j < featsArrNum[i]; j++) {
 				fread(&curr, sizeof(int), 1, file);
@@ -116,11 +116,13 @@ int cmpfunc(const void * a, const void * b) {
 int mostSimilar(int size, int* arr) {
 	int mostSimilarElement = arr[0];
 	int indexOfElement = 0;
+
 	for (int i = 0; i < size; i++) {
 		if (arr[i] > mostSimilarElement) {
 			mostSimilarElement = arr[i];
 			indexOfElement = i;
 		}
 	}
+
 	return indexOfElement;
 }

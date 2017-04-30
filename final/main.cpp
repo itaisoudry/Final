@@ -31,7 +31,7 @@ extern "C" {
 #define CONFIG_FLAG "-c"
 #define DEFAULT_CFG_FILE "spcbir.config"
 
-int main(int argc, char** argv) {
+int main3(int argc, char** argv) {
 	int resultValue = SUCCESS;
 	sp::ImageProc* imageProcess = NULL;
 	SPConfig config = NULL;

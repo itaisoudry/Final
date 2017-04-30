@@ -94,13 +94,13 @@ static bool basicLoggerInfoTest() {
 	return true;
 }
 
-int main3() {
+int main1() {
 
 	RUN_TEST(basicLoggerTest);
 	RUN_TEST(basicLoggerErrorTest);
 	RUN_TEST(basicLoggerDebugTest);
 	RUN_TEST(basicLoggerWarningTest);
 	RUN_TEST(basicLoggerInfoTest);
-	//RUN_TEST(loggerStduoutTest); TODO soudry! fix it!!!!
+
 	return 0;
 }
