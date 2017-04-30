@@ -9,26 +9,21 @@
 #include "Utils/ResponseCodes.h"
 #include <stdbool.h>
 #include <string.h>
-//config msg
 
-
-int saveOrLoadFeatsToFile(SPPoint*** featsArr, int numOfImages, SPConfig config,
-		int* featsArrNum, bool spExtractionMode, SP_CONFIG_MSG* msg) {
+int saveOrLoadFeatsToFile(SPPoint*** featsArr, int numOfImages, SPConfig config, int* featsArrNum,
+		bool spExtractionMode, SP_CONFIG_MSG* msg) {
 	int resultValue = SUCCESS;
 	FILE* file;
-	int  d;
+	int d;
 	double data;
-	char filename[1024], imagePrefix[1024] , directory[1024];
-	//SMART_MALLOC(char**,filename,1024*sizeof(char));
-	//char directory[1024];
-				   //, imagepefix[1024];
-	//SMART_MALLOC(char**,directory,1024*sizeof(char));
-	//SMART_MALLOC(char*,imagePrefix,1024*sizeof(char));
-	memcpy(directory, config->spImagesDirectory,strlen(config->spImagesDirectory));
-	if (*msg!=SP_CONFIG_SUCCESS){
+	char filename[1024], imagePrefix[1024], directory[1024];
+
+	memcpy(directory, config->spImagesDirectory, strlen(config->spImagesDirectory));
+	if (*msg != SP_CONFIG_SUCCESS) {
 		//TODO error
 	}
-	memcpy(imagePrefix, config->spImagesPrefix,strlen(config->spImagesPrefix));
+
+	memcpy(imagePrefix, config->spImagesPrefix, strlen(config->spImagesPrefix));
 
 	if (spExtractionMode) { //save
 		for (int i; i < numOfImages; i++) {
@@ -43,8 +38,8 @@ int saveOrLoadFeatsToFile(SPPoint*** featsArr, int numOfImages, SPConfig config,
 			for (int j = 0; j < featsArrNum[i]; j++) {
 				d = spPointGetDimension(featsArr[i][j]);
 				fwrite(&d, sizeof(int), 1, file);
-				for (int k=0; k < d; k++) {
-					data = spPointGetAxisCoor(featsArr[i][j],k);
+				for (int k = 0; k < d; k++) {
+					data = spPointGetAxisCoor(featsArr[i][j], k);
 					fwrite(&data, sizeof(double), 1, file);
 				}
 			}
@@ -63,6 +58,7 @@ int saveOrLoadFeatsToFile(SPPoint*** featsArr, int numOfImages, SPConfig config,
 			fread(&curr, sizeof(int), 1, file);
 			featsArrNum[i] = curr;
 			int malloc_size = sizeof(SPPoint*) * curr;
+
 			SMART_MALLOC(SPPoint**, featsArr[i], malloc_size);
 			for (int j = 0; j < featsArrNum[i]; j++) {
 				fread(&curr, sizeof(int), 1, file);
@@ -77,55 +73,56 @@ int saveOrLoadFeatsToFile(SPPoint*** featsArr, int numOfImages, SPConfig config,
 	return resultValue;
 	error:
 
-
-		if (!spExtractionMode) {
+	if (!spExtractionMode) {
 		for (int i = 0; i < numOfImages; i++) {
 			SMART_FREE(featsArr[i]);
 		}
-		}
-		return resultValue;
+	}
+	return resultValue;
 }
 
-const char* configMsgToString( SP_CONFIG_MSG msg){
-	switch(msg){
+const char* configMsgToString(SP_CONFIG_MSG msg) {
+	switch (msg) {
 
 	case 0:
-			return MSG0;
+		return MSG0;
 	case 1:
-			return MSG1;
+		return MSG1;
 	case 2:
-			return MSG2;
+		return MSG2;
 	case 3:
-			return MSG3;
+		return MSG3;
 	case 4:
-			return MSG4;
+		return MSG4;
 	case 5:
-			return MSG5;
+		return MSG5;
 	case 6:
-			return MSG6;
+		return MSG6;
 	case 7:
-			return MSG7;
+		return MSG7;
 	case 8:
-			return MSG8;
+		return MSG8;
 	case 9:
-			return MSG9;
+		return MSG9;
 
-	default : return MSG10;
+	default:
+		return MSG10;
 
 	}
 }
-int cmpfunc (const void * a, const void * b)
-{
-   return ( *(int*)a - *(int*)b );
+int cmpfunc(const void * a, const void * b) {
+	return (*(int*) a - *(int*) b);
 }
-int mostSimilar(int size, int* arr){
+int mostSimilar(int size, int* arr) {
 	int mostSimilarElement = arr[0];
-	int indexOfElement=0;
+	int indexOfElement = 0;
+
 	for (int i = 0; i < size; i++) {
 		if (arr[i] > mostSimilarElement) {
 			mostSimilarElement = arr[i];
 			indexOfElement = i;
 		}
 	}
+
 	return indexOfElement;
 }

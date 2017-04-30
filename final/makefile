@@ -18,8 +18,19 @@ C_COMP_FLAG = -std=c99 -Wall -Wextra \
 
 $(EXEC): $(OBJS)
 	$(CPP) $(OBJS) -L$(LIBPATH) $(LIBS) -o $@
-main.o: main.cpp #put dependencies here!
+main.o: main.cpp SPImageProc.h SPConfig.h SPLogger.h  Utils/LoggerMessages.h Utils/AllocationHandler.h Utils/ResponseCodes.h SPPoint.h KDTree.h KDArray.h main_aux.h
 	$(CPP) $(CPP_COMP_FLAG) -I$(INCLUDEPATH) -c $*.cpp
+	
+main_aux.o:main.cpp SPImageProc.h SPConfig.h SPLogger.h Utils/LoggerMessages.h Utils/AllocationHandler.h Utils/ResponseCodes.h  SPPoint.h KDTree.h KDArray.h main_aux.h
+	$(CC) $(C_COMP_FLAG) -c $*.c
+
+KDArray.o: KDArray.c KDArray.h SPLogger.h Utils/LoggerMessages.h Utils/AllocationHandler.h Utils/ResponseCodes.h SPPoint.h
+	$(CC) $(C_COMP_FLAG) -c $*.c
+
+KDTree.o: KDTree.c KDTree.h SPPoint.h KDArray.h SPLogger.h Utils/LoggerMessages.h Utils/AllocationHandler.h Utils/ResponseCodes.h  SPBPriorityQueue.h
+	$(CC) $(C_COMP_FLAG) -c $*.c
+	
+
 #a rule for building a simple c++ source file
 #use g++ -MM SPImageProc.cpp to see dependencies
 SPImageProc.o: SPImageProc.cpp SPImageProc.h SPConfig.h SPPoint.h SPLogger.h
@@ -28,5 +39,16 @@ SPImageProc.o: SPImageProc.cpp SPImageProc.h SPConfig.h SPPoint.h SPLogger.h
 #use "gcc -MM SPPoint.c" to see the dependencies
 SPPoint.o: SPPoint.c SPPoint.h 
 	$(CC) $(C_COMP_FLAG) -c $*.c
+
+SPBPriorityQueue.o: SPBPriorityQueue.c SPBPriorityQueue.h
+	$(CC) $(C_COMP_FLAG) -c $*.c
+
+SPConfig.o: SPConfig.c SPConfig.h SPLogger.h Utils/LoggerMessages.h  Utils/AllocationHandler.h Utils/ResponseCodes.h
+	$(CC) $(C_COMP_FLAG) -c $*.c
+	
+SPLogger.o: SPLogger.c SPLogger.h Utils/LoggerMessages.h
+	$(CC) $(C_COMP_FLAG) -c $*.c
+	
+	
 clean:
 	rm -f $(OBJS) $(EXEC)

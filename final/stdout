@@ -1,0 +1,14 @@
+---INFO---
+- message: Logger created
+
+---INFO---
+- message: Image Proc created
+
+---INFO---
+- message: Extraction mode: True
+
+---INFO---
+- message: Finished setting extraction mode
+
+---INFO---
+- message: KDArray init

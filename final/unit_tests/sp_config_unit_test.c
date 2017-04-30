@@ -233,9 +233,8 @@ bool spacesTest() {
 				DEFAULT_SP_LOGGER_LEVEL, "stdout");
 	return message == SP_CONFIG_SUCCESS;
 }
-int main1() {
+int main2() {
 	RUN_TEST(spacesTest);
-	//TODO= CHEKC FULL CONFIG it fails..
 	RUN_TEST(fullConfig);
 	RUN_TEST(directoryTest);
 	RUN_TEST(prefixTest);
@@ -250,7 +249,6 @@ int main1() {
 	RUN_TEST(numOfSimilarImagesTest);
 	spConfigDestroy(config);
 	return 0;
-	//TODO - combine tests - i.e dir test which include a test for space and a test for missing dir
 
 }
 bool validateConfigByValues(SPConfig config, char * spImagesDirectory,

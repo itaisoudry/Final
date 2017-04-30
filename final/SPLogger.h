@@ -31,6 +31,9 @@
 //File open mode
 #define SP_LOGGER_OPEN_MODE "w+"
 
+#define ERROR_MSG_ALLOCATION "Error: Allocation failed\n"
+#define ERROR_MSG_GENERAL "An Error has occurd\n"
+
 /**Titles**/
 #define ERROR_TITLE "---ERROR---"
 #define WARNING_TITLE "---WARNING---"
