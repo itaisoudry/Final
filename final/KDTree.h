@@ -18,17 +18,14 @@
 #include "Utils/ResponseCodes.h"
 
 #define RANDOM 0
-#define INCREMENTAL 1
-#define MAX_SPREAD 2
+#define MAX_SPREAD 1
+#define INCREMENTAL 2
 
 typedef struct KD_Tree_NODE KDTreeNode;
 
+int KDTreeInit(KDTreeNode* tree, SPPoint** p, int n, int splitMethod) ;
 KDTreeNode* NodeInit(int dim, double val, KDTreeNode* left, KDTreeNode* right, SPKDArray* data) ;
-int KDTreeInit(KDTreeNode* tree, SPPoint** p, int n, int d, int splitMethod) ;
-KDTreeNode* KDTreeBuild(SPKDArray* kdarr, int splitMethod, int iSplit) ;
 int KDTreeSearch(int* res, KDTreeNode* root, int SPKNN, SPPoint* p);
-
-int maxSpread(SPKDArray* kdarray) ;
 int treeSize ();
 
 
