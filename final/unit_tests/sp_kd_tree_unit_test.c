@@ -35,31 +35,33 @@ bool kdTreeTest() {
 	//validate init
 	ASSERT_FALSE(kdArray==NULL);
 
-	root = (KDTreeNode*)malloc(sizeof(KDTreeNode));
-	KDTreeInit(root,pointsArr,4,MAX_SPREAD);
+	root = (KDTreeNode*) malloc(sizeof(root));
+	KDTreeInit(root, pointsArr, 4, MAX_SPREAD);
 
-	ASEERT_FALSE(root==NULL);
+	ASSERT_FALSE(root==NULL);
 
-	KDTreeBuild(kdArray,MAX_SPREAD,1);
+	KDTreeBuild(kdArray, MAX_SPREAD, 1);
 
-	ASEERT_FALSE(root==NULL);
+	ASSERT_FALSE(root==NULL);
 
-	KDTreeBuild(kdArray,INCREMENTAL,2);
+	KDTreeBuild(kdArray, INCREMENTAL, 2);
 
-	ASEERT_FALSE(root==NULL);
+	ASSERT_FALSE(root==NULL);
 
-	int* res = (int*)malloc(sizeof(int));
-	KDTreeSearch(res,root,1,p2);
+	int res = 0;
+	KDTreeSearch(&res, root, 1, p2);
 
-	printf("%d",res[0]);
+	ASSERT_TRUE(res == 2);
 
-	free(res);
-	free(root);
-	free(kdArray);
+	KDTreeSearch(&res, root, 1, p3);
+
+	ASSERT_TRUE(res == 0);
+
 	spPointDestroy(p1);
 	spPointDestroy(p2);
 	spPointDestroy(p3);
 	spPointDestroy(p4);
+
 	return true;
 }
 
