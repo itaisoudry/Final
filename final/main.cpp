@@ -44,8 +44,8 @@ int main(int argc, char** argv) {
 	//variables
 	SPPoint** arrayToKDARR = NULL;
 	SPPoint*** imageProcessFeatures;
-	int spNumOfImages, spPCADimension = 20, spNumOfFeatures, spNumOfSimilarImages, spKNN, spNumOfFeaturesTotal,
-			splitMethod;
+	int spNumOfImages, spPCADimension = 20, spNumOfFeatures,
+			spNumOfSimilarImages, spKNN, spNumOfFeaturesTotal, splitMethod;
 	bool spMinimalGUI;
 	int* featsArr;
 	int* nearestNeighbors;
@@ -86,6 +86,7 @@ int main(int argc, char** argv) {
 	loggerMsg = spLoggerCreate(config->spLoggerFilename, config->spLoggerLevel);
 	if (loggerMsg != SP_LOGGER_SUCCESS) {
 		printf(ERROR_LOGGER);
+		spConfigDestroy(config);
 		return EXIT_FAILURE;
 	}
 	//TODO - LOGGER INITIALIZE MSG
@@ -94,7 +95,10 @@ int main(int argc, char** argv) {
 	//Create image proccess
 	imageProcess = new sp::ImageProc(config);
 	if (imageProcess == NULL) {
-		spLoggerPrintError(configMsgToString(configMsg), __FILE__, __func__, __LINE__);
+		spLoggerPrintError(configMsgToString(configMsg), __FILE__, __func__,
+		__LINE__);
+		spConfigDestroy(config);
+		spLoggerDestroy();
 		return EXIT_FAILURE;
 	}
 
@@ -104,46 +108,56 @@ int main(int argc, char** argv) {
 	//handle extraction mode - true
 	if (config->spExtractionMode == true) {
 		spLoggerPrintInfo(EXTRACTION_MODE_TRUE);
-		SMART_MALLOC(SPPoint***, imageProcessFeatures, sizeof(SPPoint**) * spNumOfImages);
+		SMART_MALLOC(SPPoint***, imageProcessFeatures,
+				sizeof(SPPoint**) * spNumOfImages);
 		SMART_MALLOC(int*, featsArr, sizeof(int) * spNumOfImages);
 		//now we get img path of every img and save it's features.
 		for (int i = 0; i < spNumOfImages; i++) {
 			configMsg = spConfigGetImagePath(imagePath, config, i);
 			if (configMsg != SP_CONFIG_SUCCESS) {
-				spLoggerPrintError(configMsgToString(SP_CONFIG_INVALID_ARGUMENT), __FILE__, __FUNCTION__, __LINE__);
+				spLoggerPrintError(
+						configMsgToString(SP_CONFIG_INVALID_ARGUMENT), __FILE__,
+						__FUNCTION__, __LINE__);
 
 			}
-			imageProcessFeatures[i] = imageProcess->getImageFeatures(imagePath, i, &spNumOfFeatures);
+			imageProcessFeatures[i] = imageProcess->getImageFeatures(imagePath,
+					i, &spNumOfFeatures);
 			featsArr[i] = spNumOfFeatures;
 		}
 		SMART_FUNCTION_CALL(
-				saveOrLoadFeatsToFile(imageProcessFeatures, spNumOfImages, config, featsArr, true, &configMsg)); // making file of features
+				saveOrLoadFeatsToFile(imageProcessFeatures, spNumOfImages,
+						config, featsArr, true, &configMsg)); // making file of features
 
 	} else {	//if extraction mode false
 		spLoggerPrintInfo(EXTRACTION_MODE_FALSE);
-		SMART_MALLOC(SPPoint***, imageProcessFeatures, sizeof(SPPoint**) * spNumOfImages);
+		SMART_MALLOC(SPPoint***, imageProcessFeatures,
+				sizeof(SPPoint**) * spNumOfImages);
 		SMART_MALLOC(int*, featsArr, sizeof(int) * spNumOfImages);
 		SMART_FUNCTION_CALL(
-				saveOrLoadFeatsToFile(imageProcessFeatures, spNumOfImages, config, featsArr, false, &configMsg)); // load file of features
+				saveOrLoadFeatsToFile(imageProcessFeatures, spNumOfImages,
+						config, featsArr, false, &configMsg)); // load file of features
 	}
 	spNumOfFeaturesTotal = 0;
 	spLoggerPrintInfo(EXTRACTION_MODE_FINISHED);
 	for (int i = 0; i < spNumOfImages; i++) {
 		spNumOfFeaturesTotal += featsArr[i];
 	}
-	SMART_MALLOC(SPPoint**,arrayToKDARR,spNumOfFeaturesTotal*sizeof(SPPoint*));
+	SMART_MALLOC(SPPoint**, arrayToKDARR,
+			spNumOfFeaturesTotal * sizeof(SPPoint*));
 
-	for (int i=0; i<spNumOfImages;i++){
-		memcpy(&arrayToKDARR[q], imageProcessFeatures[i], sizeof(SPPoint*) * featsArr[i]);
+	for (int i = 0; i < spNumOfImages; i++) {
+		memcpy(&arrayToKDARR[q], imageProcessFeatures[i],
+				sizeof(SPPoint*) * featsArr[i]);
 		q += featsArr[i];
 	}
 	spPCADimension = config->spPCADimension;
 	splitMethod = config->spKDTreeSplitMethod;
 	spKNN = config->spKNN;
 	SMART_MALLOC(KDTreeNode*, tree, treeSize());
-	SMART_MALLOC(int*, nearestNeighbors, sizeof(int)*spKNN);
+	SMART_MALLOC(int*, nearestNeighbors, sizeof(int) * spKNN);
 
-	SMART_FUNCTION_CALL(KDTreeInit(tree, arrayToKDARR, spNumOfFeaturesTotal, splitMethod));
+	SMART_FUNCTION_CALL(
+			KDTreeInit(tree, arrayToKDARR, spNumOfFeaturesTotal, splitMethod));
 	//pre processing phase starSted
 	spLoggerPrintInfo(PREPROCESSING_STARTED);
 
@@ -160,7 +174,8 @@ int main(int argc, char** argv) {
 		if (!strcmp(input, "<>")) {
 			break;
 		}
-		SPPoint** queryFeats = imageProcess->getImageFeatures(input,spPCADimension+1 , &spNumOfFeatures);
+		SPPoint** queryFeats = imageProcess->getImageFeatures(input,
+				spPCADimension + 1, &spNumOfFeatures);
 		if (queryFeats == NULL) {
 			printf("%s is not found, try again:\n", input);
 			continue;
@@ -169,13 +184,14 @@ int main(int argc, char** argv) {
 
 		SMART_MALLOC(int*, nearestArr, sizeof(int) * spKNN);
 		for (int j = 0; j < spKNN; j++) {
-						nearestArr[j] = 0;
-					}
+			nearestArr[j] = 0;
+		}
 
 		for (int i = 0; i < spNumOfFeatures; i++) {
 			KDTreeSearch(nearestNeighbors, tree, spKNN, queryFeats[i]);
 			if (nearestNeighbors == NULL) {
-				spLoggerPrintError("KDTreeSearch failed", __FILE__, __FUNCTION__, __LINE__);
+				spLoggerPrintError("KDTreeSearch failed", __FILE__,
+						__FUNCTION__, __LINE__);
 				return -1;
 			}
 			for (int j = 0; j < spKNN; j++) {
@@ -183,15 +199,16 @@ int main(int argc, char** argv) {
 			}
 		}
 		int* results;
-		SMART_MALLOC(int*,results,sizeof(int)*spNumOfSimilarImages);
+		SMART_MALLOC(int*, results, sizeof(int) * spNumOfSimilarImages);
 		for (int i = 0; i < spNumOfSimilarImages; i++) {
 			results[i] = mostSimilar(spKNN, nearestArr);
 			nearestArr[results[i]] = 0;
-			}
+		}
 
 		if (spMinimalGUI) {
 			for (int i = 0; i < spNumOfSimilarImages; i++) {
-				configMsg = spConfigGetImagePath(imgPathToShow, config, results[i]);
+				configMsg = spConfigGetImagePath(imgPathToShow, config,
+						results[i]);
 				if (configMsg != SP_CONFIG_SUCCESS) {
 					SMART_FREE(imgPathToShow);
 					SMART_FREE(nearestNeighbors);
@@ -205,7 +222,8 @@ int main(int argc, char** argv) {
 		} else {
 			printf("Best candidates for - <%s> - are:\n", input);
 			for (int i = 0; i < spNumOfSimilarImages; i++) {
-				configMsg = spConfigGetImagePath(imgPathToShow, config, results[i]);
+				configMsg = spConfigGetImagePath(imgPathToShow, config,
+						results[i]);
 				if (configMsg != SP_CONFIG_SUCCESS) {
 					SMART_FREE(imgPathToShow);
 					SMART_FREE(nearestNeighbors);
@@ -226,10 +244,12 @@ int main(int argc, char** argv) {
 		fflush(stdout);
 	}
 	printf("Exiting...\n");
+	//TODO iterate and destroy points
 	SMART_FREE(imageProcessFeatures);
 	SMART_FREE(featsArr);
 	SMART_FREE(tree);
-
+	spConfigDestroy(config);
+	spLoggerDestroy();
 
 	return resultValue;
 	error:
@@ -239,6 +259,8 @@ int main(int argc, char** argv) {
 	SMART_FREE(tree);
 	SMART_FREE(nearestNeighbors);
 	SMART_FREE(nearestArr);
+	spConfigDestroy(config);
+	spLoggerDestroy();
 
 	return resultValue;
 }
