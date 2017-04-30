@@ -8,38 +8,46 @@
 #include "KDArray.h"
 // coordinate printer for test
 int print_coor(CTC coor) {
+	char logInfoMsg[100];
 	int resultValue = SUCCESS;
-	printf("data: %f ", coor.coorData);
-	printf("idx: %d \n", coor.pointIndex);
+	sprintf(logInfoMsg,"data: %f ", coor.coorData);
+	spLoggerPrintInfo(logInfoMsg);
+
+	sprintf(logInfoMsg,"idx: %d \n", coor.pointIndex);
+	spLoggerPrintInfo(logInfoMsg);
+
 	return resultValue;
 }
 
 //for test
 void print_KDArr(SPKDArray* arr) {
-	printf("----array is:----\n");
-
+	char logInfoMsg[100];
+	spLoggerPrintInfo("----array is:----\n");
 	for (int i = 0; i < arr->d; i++) {
 		for (int j = 0; j < arr->n; j++) {
 			int p = (int) spPointGetAxisCoor(arr->arr[j], i);
-			printf("|%d|", p);
+			sprintf(logInfoMsg,"|%d|",p);
+			spLoggerPrintInfo(logInfoMsg);
 		}
-		printf("\n");
+		spLoggerPrintInfo("\n");
 	}
-	printf("--------------------\n");
-	printf("----mat is:----\n");
+	spLoggerPrintInfo("--------------------\n");
+	spLoggerPrintInfo("----Matrix:----\n");
 	for (int i = 0; i < arr->d; i++) {
 		for (int j = 0; j < arr->n; j++) {
-			printf("|%d|", arr->mat[i][j]);
+			sprintf(logInfoMsg,"|%d|", arr->mat[i][j]);
+			spLoggerPrintInfo(logInfoMsg);
 		}
-		printf("\n");
+		spLoggerPrintInfo("\n");
 	}
-	printf("--------------------\n");
+	spLoggerPrintInfo("--------------------\n");
 }
 
 // a comparator  for the matrix sort
 int comp_by_coor(const void* a, const void* b) {
 	CTC* A = (CTC*) a;
 	CTC* B = (CTC*) b;
+
 	if (A->coorData > B->coorData) {
 		return 1;
 	} else {
@@ -53,7 +61,7 @@ int init(SPKDArray* res, SPPoint** array, int size) {
 	CTC* helpArr = NULL;
 	int** mat = NULL;
 
-//	SMART_MALLOC(SPKDArray*, res, sizeof(SPKDArray));
+	spLoggerPrintInfo("KDArray init");
 
 	SMART_MALLOC(CTC*, helpArr, size * sizeof(CTC));
 
@@ -122,6 +130,8 @@ int Split(SPKDArray* KDarr, int coor, SPKDArray* left, SPKDArray* right) {
 	int** mat2 = NULL;
 	SPPoint** P1 = NULL;
 	SPPoint** P2 = NULL;
+
+	spLoggerPrintInfo("Split");
 
 	if (n % 2 == 0) {
 		middle = n / 2;
@@ -203,6 +213,8 @@ int Split(SPKDArray* KDarr, int coor, SPKDArray* left, SPKDArray* right) {
 		k = 0;
 	}
 
+
+	//update values
 	left->arr = P1;
 	right->arr = P2;
 	left->n = middle;

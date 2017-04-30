@@ -20,7 +20,7 @@ SP_LOGGER_MSG spLoggerCreate(const char* filename, SP_LOGGER_LEVEL level) {
 
 	logger->level = level; //Set the level of the logger
 
-	if (filename == NULL) { //In case the filename is not set use stdout
+	if (filename == NULL || strcmp(filename,STDOUT)==0) { //In case the filename is not set use stdout
 		logger->outputChannel = stdout;
 		logger->isStdOut = true;
 	} else { //Otherwise open the file in write mode
@@ -104,7 +104,7 @@ SP_LOGGER_MSG spLoggerPrintInfo(const char* msg) {
 				return SP_LOGGER_WRITE_FAIL;
 		}
 	}
-
+	fflush(NULL);
 	return SP_LOGGER_SUCCESS;
 }
 SP_LOGGER_MSG spLoggerPrintDebug(const char* msg, const char* file, const char* function, const int line) {
