@@ -31,7 +31,7 @@ extern "C" {
 #define CONFIG_FLAG "-c"
 #define DEFAULT_CFG_FILE "spcbir.config"
 
-int main3(int argc, char** argv) {
+int main(int argc, char** argv) {
 	int resultValue = SUCCESS;
 	sp::ImageProc* imageProcess = NULL;
 	SPConfig config = NULL;
@@ -246,24 +246,42 @@ int main3(int argc, char** argv) {
 		printf(ENTER_IMG_PATH);
 		fflush(stdout);
 	}
-	spLoggerPrintInfo("Exiting...\n");
-	//TODO iterate and destroy points
+	spLoggerPrintInfo(EXIT_MSG);
+	for (int i;i<spNumOfImages;i++){
+		for (int j; j<featsArr[i]; j++){
+			spPointDestroy(imageProcessFeatures[i][j]);
+		}
+		SMART_FREE(imageProcessFeatures[i]);
+
+	}
+//	for (int i=0; i<spNumOfFeaturesTotal;i++){
+//		spPointDestroy(arrayToKDARR[i]);
+//	}
+	SMART_FREE(arrayToKDARR);
 	SMART_FREE(imageProcessFeatures);
 	SMART_FREE(featsArr);
-	SMART_FREE(tree);
+	destroyTree(tree);
 	spConfigDestroy(config);
 	spLoggerDestroy();
 
 	return resultValue;
 	error:
-	SMART_FREE(imgPathToShow);
+	spLoggerPrintInfo(EXIT_MSG);
+	for (int i;i<spNumOfImages;i++){
+		for (int j; j<featsArr[i]; j++){
+			spPointDestroy(imageProcessFeatures[i][j]);
+		}
+		SMART_FREE(imageProcessFeatures[i]);
+
+	}
+	for (int i=0; i<spNumOfFeaturesTotal;i++){
+		spPointDestroy(arrayToKDARR[i]);
+	}
+	SMART_FREE(arrayToKDARR);
 	SMART_FREE(imageProcessFeatures);
 	SMART_FREE(featsArr);
-	SMART_FREE(tree);
-	SMART_FREE(nearestNeighbors);
-	SMART_FREE(nearestArr);
+	destroyTree(tree);
 	spConfigDestroy(config);
-	spLoggerDestroy();
 
 	if (resultValue == ALLOCATION_FAILED) {
 		spLoggerPrintError(ERROR_MSG_ALLOCATION, __FILE__, __FUNCTION__, __LINE__);
@@ -271,6 +289,8 @@ int main3(int argc, char** argv) {
 		spLoggerPrintError(ERROR_MSG_GENERAL, __FILE__,
 								__FUNCTION__, __LINE__);
 	}
+	spLoggerDestroy();
+
 	return resultValue;
 }
 

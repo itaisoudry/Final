@@ -79,4 +79,11 @@ int treeSize();
  */
 int isLeaf(KDTreeNode* node);
 
+//free all tree's memory
+/**
+ * @param root - root of the tree;
+ */
+int destroyTree(KDTreeNode* root);
 #endif /* KDTREE_H_ */
+
+

@@ -65,7 +65,7 @@ bool kdTreeTest() {
 	return true;
 }
 
-int main() {
+int main12() {
 	RUN_TEST(kdTreeTest);
 	return 0;
 }

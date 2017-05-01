@@ -131,7 +131,7 @@ int Split(SPKDArray* KDarr, int coor, SPKDArray* left, SPKDArray* right) {
 	SPPoint** P1 = NULL;
 	SPPoint** P2 = NULL;
 
-	spLoggerPrintInfo("Split");
+
 
 	if (n % 2 == 0) {
 		middle = n / 2;
