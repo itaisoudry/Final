@@ -134,6 +134,7 @@ int main(int argc, char** argv) {
 	}
 
 	spNumOfFeaturesTotal = 0;
+
 	spLoggerPrintInfo(EXTRACTION_MODE_FINISHED);
 
 	for (int i = 0; i < spNumOfImages; i++) {
@@ -190,10 +191,12 @@ int main(int argc, char** argv) {
 
 		for (int i = 0; i < spNumOfFeatures; i++) {
 			KDTreeSearch(nearestNeighbors, tree, spKNN, queryFeats[i]);
+
 			if (nearestNeighbors == NULL) {
 				spLoggerPrintError("KDTreeSearch failed", __FILE__, __FUNCTION__, __LINE__);
 				return -1;
 			}
+
 			for (int j = 0; j < spKNN; j++) {
 				nearestArr[nearestNeighbors[j]] += 1;
 			}
@@ -201,6 +204,7 @@ int main(int argc, char** argv) {
 
 		int* results;
 		SMART_MALLOC(int*, results, sizeof(int) * spNumOfSimilarImages);
+
 		for (int i = 0; i < spNumOfSimilarImages; i++) {
 			results[i] = mostSimilar(spKNN, nearestArr);
 			nearestArr[results[i]] = 0;
@@ -243,10 +247,14 @@ int main(int argc, char** argv) {
 			SMART_FREE(results);
 
 		}
+
 		printf(ENTER_IMG_PATH);
 		fflush(stdout);
 	}
+
 	spLoggerPrintInfo(EXIT_MSG);
+
+	//FREE EVERYTHING
 	for (int i;i<spNumOfImages;i++){
 		for (int j; j<featsArr[i]; j++){
 			spPointDestroy(imageProcessFeatures[i][j]);
@@ -254,9 +262,7 @@ int main(int argc, char** argv) {
 		SMART_FREE(imageProcessFeatures[i]);
 
 	}
-//	for (int i=0; i<spNumOfFeaturesTotal;i++){
-//		spPointDestroy(arrayToKDARR[i]);
-//	}
+
 	SMART_FREE(arrayToKDARR);
 	SMART_FREE(imageProcessFeatures);
 	SMART_FREE(featsArr);
