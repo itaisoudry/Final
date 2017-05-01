@@ -85,4 +85,6 @@ bool kdArrayTest() {
 }
 int main22(int argc, const char* argv[]) {
 	RUN_TEST(kdArrayTest);
+
+	return 0;
 }

@@ -29,12 +29,11 @@ int isLeaf(KDTreeNode* node) {
 	return 0;
 }
 
-KDTreeNode* NodeInit(int dim, double val, KDTreeNode* left, KDTreeNode* right,
-		SPKDArray* data) {
+KDTreeNode* NodeInit(int dim, double val, KDTreeNode* left, KDTreeNode* right, SPKDArray* data) {
 	KDTreeNode* node = (KDTreeNode*) malloc(sizeof(KDTreeNode));
 	if (node == NULL) {
 		spLoggerPrintError(ERROR_MSG_ALLOCATION, __FILE__, __FUNCTION__,
-				__LINE__);
+		__LINE__);
 		return NULL;
 	}
 
@@ -58,14 +57,14 @@ KDTreeNode* KDTreeBuild(SPKDArray* kdarr, int splitMethod, int i_Split) {
 	KDTreeNode* left = (KDTreeNode*) malloc(sizeof(KDTreeNode));
 	if (!left) {
 		spLoggerPrintError(ERROR_MSG_ALLOCATION, __FILE__, __FUNCTION__,
-				__LINE__);
+		__LINE__);
 		return NULL;
 	}
 
 	KDTreeNode* right = (KDTreeNode*) malloc(sizeof(KDTreeNode));
 	if (!right) {
 		spLoggerPrintError(ERROR_MSG_ALLOCATION, __FILE__, __FUNCTION__,
-				__LINE__);
+		__LINE__);
 		free(left);
 		return NULL;
 	}
@@ -73,7 +72,7 @@ KDTreeNode* KDTreeBuild(SPKDArray* kdarr, int splitMethod, int i_Split) {
 	SPKDArray* leftArr = (SPKDArray*) malloc(sizeof(SPKDArray));
 	if (!leftArr) {
 		spLoggerPrintError(ERROR_MSG_ALLOCATION, __FILE__, __FUNCTION__,
-				__LINE__);
+		__LINE__);
 		free(left);
 		free(right);
 		return NULL;
@@ -82,7 +81,7 @@ KDTreeNode* KDTreeBuild(SPKDArray* kdarr, int splitMethod, int i_Split) {
 	SPKDArray* rightArr = (SPKDArray*) malloc(sizeof(SPKDArray));
 	if (!rightArr) {
 		spLoggerPrintError(ERROR_MSG_ALLOCATION, __FILE__, __FUNCTION__,
-				__LINE__);
+		__LINE__);
 		free(leftArr);
 		free(left);
 		free(right);
@@ -254,12 +253,10 @@ int maxSpread(SPKDArray* kdarray) {
 	int j = 0;
 	double min, max;
 	double maxS = 0;
-	char logErrorMsg[100];
 
 	for (int i = 0; i < kdarray->d; i++) {
 		min = spPointGetAxisCoor((kdarray->arr[kdarray->mat[i][0]]), i);
-		max = spPointGetAxisCoor(kdarray->arr[kdarray->mat[i][kdarray->n - 1]],
-				i);
+		max = spPointGetAxisCoor(kdarray->arr[kdarray->mat[i][kdarray->n - 1]], i);
 
 		if ((max - min) > maxS) {
 			maxS = max - min;
@@ -272,24 +269,23 @@ int maxSpread(SPKDArray* kdarray) {
 
 int destroyTree(KDTreeNode* root) {
 	int resultValue = 0;
+
 	if (root != NULL) {
 		if (isLeaf(root)) {
 			for (int i = 0; i < root->data->n; i++) {
-				spPointDestroy(root->data);
+				spPointDestroy(root->data->arr[i]);
 			}
 			SMART_FREE(root->data)
-			SMART_FREE(root);
 		} else {
-			destroyTree(root->left);
-			destroyTree(root->right);
-			SMART_FREE(root);
+			if (root->left != NULL&& root->left->data!=NULL)
+				destroyTree(root->left);
+			if (root->right != NULL && root->right->data!=NULL)
+				destroyTree(root->right);
+
 		}
 	}
-	else{
-		return resultValue;
 
-	}
+	SMART_FREE(root);
+
 	return resultValue;
-	error:
-		return resultValue;
 }
