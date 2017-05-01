@@ -102,11 +102,11 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue* source, int index, double value) {
 	int maxSize = source->maxSize;
 	bool found = false;
 	BPQueueElement *newElement;
+
 	if (source == NULL || index < 0) {
 		return SP_BPQUEUE_INVALID_ARGUMENT;
 	}
 	newElement = (BPQueueElement*) malloc(sizeof(BPQueueElement));
-	//we assume that if the allocation didn't succeed is cause of memory problems.
 	if (newElement == NULL) {
 		printf("Error allocating memory");
 		return SP_BPQUEUE_OUT_OF_MEMORY;
@@ -117,7 +117,7 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue* source, int index, double value) {
 
 	newElement->index = index;
 	newElement->value = value;
-	//actual size is the source size +1 cause size starts from -1 incase of empty array
+
 	size = source->size + 1;
 	swapIndex = size - 1;
 	if (size == maxSize) {
@@ -130,7 +130,7 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue* source, int index, double value) {
 		}
 		swapIndex--;
 	}
-//while bigger value not found and not finished iterating over array
+
 	while ((i % maxSize) < size && !found) {
 		//if bigger value found
 		if ((source->queue[i]).value > value) {
