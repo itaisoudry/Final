@@ -11,35 +11,20 @@
 
 /**
  * This function is used to safely allocate memory.
- * If memory allocation failes, the function will jump to the error label ( which will free all the memory allocated in the function )
+ * If memory allocation fails, the function will jump to the error label ( which will free all the memory allocated in the function )
  */
-#define SMART_MALLOC(type, ptr, size)\
-		ptr = (type) malloc(size);\
-		if(ptr==NULL){\
+#define SMART_MALLOC(pointerType, pointer, size)\
+		pointer = (pointerType) malloc(size);\
+		if(pointer==NULL){\
 			resultValue = ALLOCATION_FAILED;\
 			goto error;\
 		}
 
-#define SMART_FREE(ptr)\
-		if (ptr!=NULL){\
-			free(ptr);\
-		}\
-		ptr = NULL;\
-
-
-#define SMART_REALLOC(type, ptr, size)\
-		if(ptr==NULL){\
-			SMART_MALLOC(type, ptr, size);\
-		}else{\
-		ptr = (type) realloc(ptr, size);\
-		if(ptr==NULL){\
-			resultValue = ALLOCATION_FAILED;\
-			goto error;\
-		}}
+#define SMART_FREE(pointer)\
+		if (pointer!=NULL){free(pointer);}\
+		pointer = NULL;\
 
 #define SMART_FUNCTION_CALL(function)\
 	resultValue = function;\
-	if(resultValue!=SUCCESS){\
-		goto error;\
-	}
+	if(resultValue!=SUCCESS){goto error;}
 #endif /* UTILS_ALLOCATIONHANDLER_H_ */
